@@ -1,9 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
 import {
   Platform,
@@ -16,6 +10,9 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons'
+import { Actions } from 'react-native-router-flux'
+import Modal from 'react-native-modal'
+import { connect } from 'react-redux'
 
 const userIcon = (
     <View style={{top: 15}}>
@@ -29,7 +26,11 @@ const passIcon = (
     </View>
 )
 
-export default class App extends Component<Props> {
+export default class LoginScreen extends Component<Props> {
+  login() {
+    Actions.home()
+  }
+
   render() {
     return (
         <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
@@ -54,7 +55,7 @@ export default class App extends Component<Props> {
               style={styles.textInput}
             />
           </View>
-          <TouchableOpacity style={styles.buttonLogin}>
+          <TouchableOpacity onPress={this.login} style={styles.buttonLogin}>
               <Text style={styles.textLogin}>Log In</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -70,7 +71,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 15,
     paddingRight: 15,
-    borderRadius: 5,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center'

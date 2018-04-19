@@ -1,0 +1,2 @@
+// SideBar
+export const SIDEBAR_SET_VISIBILITY = 'SIDEBAR_SET_VISIBILITY'
