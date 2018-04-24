@@ -52,6 +52,7 @@ export default class LoginScreen extends Component<Props> {
               underlineColorAndroid = "transparent"
               placeholder="Password"
               placeholderTextColor="#ffffff"
+              secureTextEntry={true}
               style={styles.textInput}
             />
           </View>
@@ -97,7 +98,8 @@ const styles = StyleSheet.create({
   textInput: {
     top: 10,
     marginLeft: 20,
-    width: '80%'
+    width: '80%',
+    color: '#ffffff'
   },
   buttonLogin: {
     marginTop:30,

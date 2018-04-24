@@ -10,6 +10,7 @@ import { Router, Scene, Stack } from 'react-native-router-flux'
 import { connect, Provider } from 'react-redux'
 import LoginScreen from '../components/screens/LoginScreen'
 import Home from '../components/screens/Home'
+import DetailScreen from '../components/screens/DetailScreen'
 import store from '../store'
 
 
@@ -30,6 +31,11 @@ export default class DemoApp extends React.Component {
             <Scene key='home'
                    component={Home}
                    title='Home'
+                   panHandlers={null}
+                   hideNavBar={true} />
+            <Scene key='detail'
+                   component={DetailScreen}
+                   title='DetailScreen'
                    panHandlers={null}
                    hideNavBar={true} />
           </Scene>
