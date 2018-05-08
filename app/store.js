@@ -21,14 +21,14 @@ const store = createStore(
 
 let persistor = null
 
-//
+
 // Persist store:
 // When the user signs in, create a new persistor using persistStore.
 // When the user logs out, pause the old persistor (which still exists in
 // memory but no longer used) and create a new persistor (via persistStore),
 // with different keys.
-//
-//
+
+
 // const offlineSupportEntitiesFilter = createWhitelistFilter(
 //   'entities',
 //   ['inspections', 'inspectionItems']
@@ -38,11 +38,11 @@ let persistor = null
 //   'inspectionListingScreen',
 //   ['inspectionIds', 'completed', 'fetching', 'lastCreatedAt', 'maxUpdatedAt']
 // )
-//
-// const offlineSupportAutoSyncFilter = createWhitelistFilter(
-//   'autoSync',
-//   ['autoSync']
-// )
+
+const offlineSupportAutoSyncFilter = createWhitelistFilter(
+  'dataPlat',
+  ['dataPlat']
+)
 
 
 // function orientationListener(orientation) {
@@ -52,31 +52,32 @@ let persistor = null
 // Orientation.addOrientationListener(orientationListener)
 // orientationListener(Orientation.getInitialOrientation())
 
-//
-// export function createPersistor(userId, callback) {
-//   persistor = persistStore(store, {
-//     storage: AsyncStorage,
-//     keyPrefix: `state/user:${userId}`,
-//     whitelist: ['entities', 'inspectionListingScreen', 'autoSync'],
-//     transforms: [
-//       offlineSupportEntitiesFilter,
-//       offlineSupportInspectionListingScreenFilter,
-//       offlineSupportAutoSyncFilter,
-//     ],
-//   }, callback)
-// }
-//
-// export function pausePersistor() {
-//   if (persistor) {
-//     persistor.pause()
-//   }
-// }
-//
-// export function purgePersistor() {
-//   if (persistor) {
-//     persistor.purge()
-//     persistor = null
-//   }
-// }
+
+export function createPersistor(userId, callback) {
+  console.log('kenadeh');
+  persistor = persistStore(store, {
+    storage: AsyncStorage,
+    keyPrefix: 'root',
+    whitelist: ['dataPlat'],
+    transforms: [
+      offlineSupportEntitiesFilter,
+      offlineSupportInspectionListingScreenFilter,
+      offlineSupportAutoSyncFilter,
+    ],
+  }, callback)
+}
+
+export function pausePersistor() {
+  if (persistor) {
+    persistor.pause()
+  }
+}
+
+export function purgePersistor() {
+  if (persistor) {
+    persistor.purge()
+    persistor = null
+  }
+}
 
 export default store

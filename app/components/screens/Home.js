@@ -10,41 +10,57 @@ import {
   ActivityIndicator,
   WebView,
   Linking,
-  Button
+  Button,
+  AsyncStorage
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import _ from 'lodash'
+import listingStyles from '../../styles/listing'
+import layoutStyles from '../../styles/layout'
+import styles from '../../styles/home'
+import { setDataFetch } from '../../actions/dataPlat'
+import { connect } from 'react-redux'
+import lodash from 'lodash'
 
 const barsIcon = (<Icon name="bars" size={30} color="black" />)
 const searchIcon = (<Icon name="search" size={20} color="black" style={{alignSelf: 'center'}}/>)
 
 export default class Home extends Component {
   constructor(props) {
+    AsyncStorage.getItem('name', (error, result) => {
+    if (result) {
+      this.setState({
+            name: result
+      });
+    }
+  });
     super(props)
     this.state = {
       searchText: null,
-      articles: [
-        {plat: 'B 1111 AAC', name: 'AVANZA', color: 'KUNING'},
-        {plat: 'B 2222 FAK', name: 'XENIA', color: 'MERAH'},
-        {plat: 'B 3333 SUI', name: 'RUSH', color: 'BIRU'},
-        {plat: 'B 4444 UTA', name: 'TERIOS', color: 'MERAH'},
-        {plat: 'B 5555 TIA', name: 'PAJERO', color: 'HIJAU'},
-        {plat: 'B 6666 BAC', name: 'JAZZ', color: 'SILVER'},
-        {plat: 'B 7777 KKK', name: 'FREED', color: 'MERAH'},
-        {plat: 'B 8888 CDR', name: 'YARIS', color: 'PUTIH'},
-        {plat: 'B 9999 STO', name: 'AYLA', color: 'PUTIH'},
-        {plat: 'B 6666 BAC', name: 'JAZZ', color: 'DOFF'},
-        {plat: 'B 7777 KKK', name: 'FREED', color: 'HITAM'},
-        {plat: 'B 8888 CDR', name: 'YARIS', color: 'HITAM'},
-        {plat: 'B 9999 STO', name: 'AYLA', color: 'PUTIH'},
-      ],
+      articles: [],
+      articles1: [],
       fetch: false,
+      search:[]
     }
+    this.getArticles = this.getArticles.bind(this)
     this.renderRow = this.renderRow.bind(this)
+    this.onSearch = this.onSearch.bind(this)
+  }
+
+  componentWillMount() {
+    this.checkData()
   }
 
   componentDidMount() {
+    AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
+      let data = JSON.parse(dataPlat)
+      if (data.length == 0) {
+        this.getArticles()
+      } else {
+        this.setState({articles: data, articles1: data})
+      }
+    })
   }
 
   onChangeTextSearch(text) {
@@ -53,34 +69,62 @@ export default class Home extends Component {
     })
   }
 
-  // async getArticles() {
-  //   try {
-  //     this.setState({fetch: true})
-  //     let api_key = '15410937072241ac91c95a599963e337'
-  //     let params = this.state.search
-  //     let url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
-  //     let response = await fetch(`${url}?api_key=${api_key}&q=${params}`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Accept': 'application/json',
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //     let responseJson = await response.json()
-  //     // console.log('responseJson:', responseJson)
-  //     if (responseJson.error) {
-  //       console.log(responseJson.error);
-  //     } else {
-  //       let articles = responseJson
-  //       this.setState({articles: articles.response.docs, fetch: false})
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  async getArticles() {
+    try {
+      this.setState({fetch: true})
+      let response = await fetch('http://tokosibuk.com/v1/konversi.php', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+      } else {
+        let articles = responseJson
+        AsyncStorage.setItem('dataPlat', JSON.stringify(articles))
+        this.setState({articles: articles, articles1: articles, fetch: false})
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  checkData() {
+    AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
+      let data = JSON.parse(dataPlat)
+      this.setState({ articles1: data, articles: data })
+    })
+  }
 
   toDetail(article) {
     Actions.detail({ item: article.item })
+  }
+
+  onSearch() {
+    let { searchText, articles, articles1 } = this.state
+    let platS = _.map(this.state.articles1, 'plat');
+    let filter = new RegExp(searchText, "i")
+    let filterPlat = _.filter(platS, function(i) { return i.match(filter); });
+    let search = []
+    let a = articles1.map((item) => {
+      _.forEach(filterPlat, function(value) {
+        if (value == item.plat) {
+          search.push(item)
+        }
+      });
+    })
+    if (!searchText) {
+      this.setState({
+        articles: articles1
+      })
+    } else {
+      this.setState({
+        articles: search
+      })
+    }
   }
 
   renderRow(article) {
@@ -118,7 +162,7 @@ export default class Home extends Component {
               value={this.state.searchText ? this.state.searchText.toUpperCase() : null}
               keyboardType='ascii-capable'/>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={this.onSearch}>
             <View style={{backgroundColor:'rgb(0, 185, 230)', width: 35, height:35, borderRadius: 17.5, justifyContent: 'center'}}>
               {searchIcon}
             </View>
@@ -130,11 +174,10 @@ export default class Home extends Component {
   }
 
   render() {
-    let { articles, newest, older } = this.state
-
+    let { articles1, articles, newest, older } = this.state
     let data = []
     let content = null
-    if (articles.length == 0 || this.state.fetch) {
+    if (this.state.fetch) {
       content = (
         <ActivityIndicator
           animating={true}
@@ -145,8 +188,15 @@ export default class Home extends Component {
       content = (
         <FlatList
           data = {data.concat(this.state.articles)}
-          keyExtractor = {this.keyExtractor}
           renderItem = {this.renderRow} />
+      )
+    }
+
+    if (!this.state.fetch && this.state.articles.length == 0) {
+      content = (
+        <View style={{justifyContent:'center', alignItems:'center', marginTop:30}}>
+          <Text style={{fontSize:20}}>Plat Tidak Ditemukan</Text>
+        </View>
       )
     }
 
@@ -160,54 +210,3 @@ export default class Home extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    backgroundColor: '#c661e8',
-    height: 70,
-    padding: 10,
-    paddingTop: 20,
-  },
-  container1: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-});
-
-const listingStyles = StyleSheet.create({
-  body: {
-    backgroundColor: '#f3f3f3',
-  },
-  container: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  inspectionRow: {
-    flex: 1,
-    flexDirection: 'row',
-    marginTop: 2,
-    marginBottom: 2,
-    padding: 10,
-    paddingLeft: 20,
-    borderRadius: 2,
-    backgroundColor: '#FFFFFF',
-  },
-  inspectionRowContent: {
-    flex: 1
-  },
-  inspectionRowInspectionName: {
-    color: '#107DCB',
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-})
-
-const layoutStyles = StyleSheet.create({
-  body: {
-    backgroundColor:'white',
-    height: '100%',
-  },
-})

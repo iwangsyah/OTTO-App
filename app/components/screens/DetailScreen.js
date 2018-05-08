@@ -27,11 +27,8 @@ export default class DetailScreen extends Component {
     let { item } = this.props
 
     return (
-      <View style={styles.container}>
-        <TouchableOpacity onPress={this.back.bind(this)}>
-          {barsIcon}
-        </TouchableOpacity>
-        <Text style={{fontSize: 20, fontWeight: 'bold', marginLeft: 20}}> {item.plat} </Text>
+      <View style={styles.containerHeader}>
+        <Text style={styles.text3}> {item.plat} </Text>
       </View>
     )
   }
@@ -39,14 +36,29 @@ export default class DetailScreen extends Component {
   render() {
     let { item } = this.props
     return(
-      <View>
+      <View style={{backgroundColor:'#ffffff', height:'100%', flexDirection:'column', justifyContent:'space-between'}}>
         {this.renderHeader()}
-        <View style={{margin:10 }}>
-          <Text style={{fontWeight:'bold'}}> MODEL : {item.name}</Text>
+        <View style={{margin:10}}>
+              <Text style={styles.text1}>NAMA :</Text>
+              <Text style={styles.text2}>{item.asset}</Text>
+              <Text style={styles.text1}>WARNA :</Text>
+              <Text style={styles.text2}>{item.color}</Text>
+              <Text style={styles.text1}>HARGA :</Text>
+              <Text style={styles.text2}>Rp {item.amount},-</Text>
+              <Text style={styles.text1}>STATUS :</Text>
+              <Text style={styles.text2}>{item.status}</Text>
         </View>
-        <View style={{margin:10, marginTop:0}}>
-          <Text style={{fontWeight:'bold'}}> WARNA : {item.color}</Text>
-        </View>
+        <TouchableOpacity onPress={this.back.bind(this)} style={{    marginTop:30,
+            padding: 10,
+            backgroundColor:'#c661e8',
+            width: '80%',
+            justifyContent:'center',
+            alignSelf:'center',
+            alignItems: 'center',
+            borderRadius: 20,
+            bottom:20}}>
+            <Text style={styles.text4}>Kembali Ke Pencarian</Text>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -54,11 +66,34 @@ export default class DetailScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  containerHeader: {
     backgroundColor: '#c661e8',
     flexDirection: 'row',
+    justifyContent:'center',
     height: 70,
     padding: 10,
     paddingTop: 20,
   },
+  text1: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color:'#000000'
+  },
+  text2: {
+    fontSize: 20,
+    marginLeft: 20,
+    color:'#000000',
+    marginBottom:30
+  },
+  text3: {
+    fontSize:30,
+    fontWeight:'bold',
+    color:'#ffffff',
+    alignSelf:'center'
+  },
+  text4: {
+    fontSize:20,
+    fontWeight:'bold',
+    color:'#ffffff',
+  }
 });

@@ -1,7 +1,7 @@
 import { AsyncStorage } from 'react-native'
 import _ from 'lodash'
 
-const STORAGE_KEY = '@Facilgo:log'
+const STORAGE_KEY = '@OTTO:log'
 const MAX_HISTORY = 100
 
 class LogStore {
@@ -17,6 +17,7 @@ class LogStore {
   }
 
   async save() {
+    console.log('asa.');
     try {
       let historyJson = JSON.stringify(this.history)
       await AsyncStorage.setItem(STORAGE_KEY, historyJson)
