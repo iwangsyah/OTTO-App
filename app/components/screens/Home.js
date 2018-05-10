@@ -55,10 +55,10 @@ export default class Home extends Component {
   componentDidMount() {
     AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
       let data = JSON.parse(dataPlat)
-      if (data.length == 0) {
-        this.getArticles()
-      } else {
+      if (data && data.length != 0) {
         this.setState({articles: data, articles1: data})
+      } else {
+        this.getArticles()
       }
     })
   }
@@ -128,12 +128,16 @@ export default class Home extends Component {
   }
 
   renderRow(article) {
+    let plat = null
+    if (article.item) {
+      plat = article.item.plat
+    }
     return (
       <TouchableOpacity onPress={this.toDetail.bind(this, article)}>
         <View style={listingStyles.inspectionRow}>
           <View style={listingStyles.inspectionRowContent}>
             <Text style={listingStyles.inspectionRowInspectionName}>
-              {article.item.plat}
+              {plat}
             </Text>
           </View>
         </View>
@@ -173,6 +177,12 @@ export default class Home extends Component {
     )
   }
 
+keyExtractor(data) {
+  if (data) {
+    return data.plat
+  }
+}
+
   render() {
     let { articles1, articles, newest, older } = this.state
     let data = []
@@ -188,16 +198,18 @@ export default class Home extends Component {
       content = (
         <FlatList
           data = {data.concat(this.state.articles)}
+          keyExtractor = {this.keyExtractor}
           renderItem = {this.renderRow} />
       )
     }
-
-    if (!this.state.fetch && this.state.articles.length == 0) {
-      content = (
-        <View style={{justifyContent:'center', alignItems:'center', marginTop:30}}>
-          <Text style={{fontSize:20}}>Plat Tidak Ditemukan</Text>
-        </View>
-      )
+    if (this.state.articles) {
+      if (!this.state.fetch && this.state.articles.length == 0) {
+        content = (
+          <View style={{justifyContent:'center', alignItems:'center', marginTop:30}}>
+            <Text style={{fontSize:20}}>Plat Tidak Ditemukan</Text>
+          </View>
+        )
+      }
     }
 
     return (
