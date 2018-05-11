@@ -179,7 +179,7 @@ export default class Home extends Component {
 
 keyExtractor(data) {
   if (data) {
-    return data.plat
+    return data.no
   }
 }
 
