@@ -7,10 +7,10 @@ import {
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/Ionicons';
+import Communications from 'react-native-communications'
 
-const barsIcon = (<Icon name="ios-arrow-back" size={30} color="black" />)
 
-export default class DetailScreen extends Component {
+export default class KontakScreen extends Component {
 
   back() {
     Actions.pop()
@@ -33,6 +33,22 @@ export default class DetailScreen extends Component {
         {this.renderHeader()}
           <View style={{margin:10}}>
                 <Text style={styles.text1}>Bpk. Wahyu</Text>
+                <Text style={styles.text2}>0819 0805 7587</Text>
+                <TouchableOpacity onPress={() => Communications.phonecall('081908057587', true)}
+                style={{
+                  marginTop:30,
+                  padding:10,
+                  backgroundColor:'green',
+                  width: 150,
+                  justifyContent:'center',
+                  alignSelf:'center',
+                  alignItems: 'center',
+                  borderRadius: 20}}>
+                    <View style={{flexDirection:'row', alignItems:'center'}}>
+                      <Icon name="ios-call-outline" size={40} color="#ffffff" style={{marginRight:10}}/>
+                      <Text style={styles.text4}>Panggil</Text>
+                    </View>
+                </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={this.back.bind(this)} style={{    marginTop:30,
               padding: 10,
@@ -68,10 +84,11 @@ const styles = StyleSheet.create({
     color:'#000000'
   },
   text2: {
-    fontSize: 20,
-    marginLeft: 20,
-    color:'#000000',
-    marginBottom:30
+    fontSize: 30,
+    marginTop: 10,
+    color:'blue',
+    fontWeight:'bold',
+    alignSelf:'center'
   },
   text3: {
     fontSize:30,
