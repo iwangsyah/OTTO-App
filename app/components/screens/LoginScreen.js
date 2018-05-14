@@ -17,18 +17,6 @@ import DeviceInfo from 'react-native-device-info';
 import styles from '../../styles/loginScreen'
 const md5 = require('js-md5');
 
-const userIcon = (
-    <View style={{top: 15}}>
-      <Icon name="ios-person" size={30} color="#ffffff" />
-    </View>
-)
-
-const passIcon = (
-    <View style={{top: 15}}>
-      <Icon name="ios-lock" size={30} color="#ffffff" />
-    </View>
-)
-
 export default class LoginScreen extends Component {
   constructor(props) {
     super(props);
@@ -50,6 +38,7 @@ export default class LoginScreen extends Component {
   }
 
   async checkLogin() {
+    let { username, password } = this.state
     try {
       let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
 			method:'post',
@@ -59,9 +48,8 @@ export default class LoginScreen extends Component {
 			},
 			body:JSON.stringify({
 				// we will pass our input data to server
-        "username":"admin",
-        "password":"24b0712e91489671013c3bc67d4ec8",
-        "phone_imei": "38"
+        "username":username,
+        "password":password,
 			})
 
 		})
@@ -69,7 +57,7 @@ export default class LoginScreen extends Component {
       if (responseJson.error) {
         console.log(responseJson.error);
       } else {
-        if (responseJson == "sama" || responseJson == "update") {
+        if (responseJson == "sukses") {
           Actions.home()
         }
         this.setState({status: responseJson})
@@ -88,13 +76,26 @@ export default class LoginScreen extends Component {
   }
 
   render() {
+    let { status } = this.state
+    let warning = null
+
+    if (status != "sukses") {
+      warning = (
+        <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+          <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username atau Password Salah</Text>
+        </View>
+      )
+    }
+
     return (
         <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
           <Text style={styles.buttonText}>
             OTTO APP
           </Text>
           <View style={styles.textInputContainer}>
-            {userIcon}
+            <View style={{top: 15}}>
+              <Icon name="ios-person" size={30} color="#ffffff" />
+            </View>
             <TextInput
               underlineColorAndroid = "transparent"
               placeholder="Username"
@@ -104,7 +105,9 @@ export default class LoginScreen extends Component {
             />
           </View>
           <View style={styles.textInputContainer}>
-            {passIcon}
+            <View style={{top: 15}}>
+              <Icon name="ios-lock" size={30} color="#ffffff" />
+            </View>
             <TextInput
               underlineColorAndroid = "transparent"
               placeholder="Password"
@@ -117,6 +120,7 @@ export default class LoginScreen extends Component {
           <TouchableOpacity onPress={this.login} style={styles.buttonLogin}>
               <Text style={styles.textLogin}>Log In</Text>
           </TouchableOpacity>
+          {warning}
         </LinearGradient>
     );
   }

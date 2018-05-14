@@ -40,7 +40,6 @@ export default class DemoApp extends React.Component {
                    panHandlers={null}
                    hideNavBar={true} />
             <Scene key='kontak'
-            initial={true}
                    component={KontakScreen}
                    title='KontakScreen'
                    panHandlers={null}
