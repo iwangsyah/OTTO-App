@@ -24,51 +24,53 @@ class SidebarModal extends Component {
     }
 
     this.gotoHome = this.gotoHome.bind(this)
-    this.gotoBantuan = this.gotoBantuan.bind(this)
+    this.gotoKontak = this.gotoKontak.bind(this)
+    this.logout = this.logout.bind(this)
   }
 
   gotoHome() {
-    Actions.home()
     this.props.hideModal()
   }
 
-  gotoBantuan() {
-    Actions.bantuan()
+  gotoKontak() {
     this.props.hideModal()
+    Actions.kontak()
+  }
+
+  logout() {
+    this.props.hideModal()
+    Actions.login()
   }
 
   render() {
-    let { visible, signedIn, logout, hideModal } = this.props
+    let { visible, signedIn, hideModal } = this.props
     let { showDeveloperMenu } = this.state
-    let reset = () => {
-      this.props.hideModal()
-    }
 
     let signInMenus = []
 
       signInMenus.push(
-        <TouchableOpacity onPress={this.gotoSyncManager}>
+        <TouchableOpacity onPress={this.gotoHome}>
           <View style={styles.titleContainer}>
             <Icon name="ios-home-outline" size={30} style={{top:5}} style={{top:5}}/>
-            <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Beranda</Text>
+            <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Home</Text>
           </View>
         </TouchableOpacity>
       )
 
       signInMenus.push(
-          <TouchableOpacity onPress={this.gotoAutoSyncSelection}>
+          <TouchableOpacity onPress={this.gotoKontak}>
             <View style={styles.titleContainer}>
-              <Icon name="ios-download-outline" size={30} style={{top:5}}/>
-              <Text style={styles.menuModalItem}>Kotak Masuk</Text>
+              <Icon name="ios-call-outline" size={30} style={{top:5}}/>
+              <Text style={styles.menuModalItem}>Kontak</Text>
             </View>
           </TouchableOpacity>
       )
 
       signInMenus.push(
-          <TouchableOpacity onPress={logout}>
+          <TouchableOpacity onPress={this.logout}>
             <View style={styles.titleContainer}>
-              <Icon name="ios-person-outline" size={30} style={{top:5}}/>
-              <Text style={styles.menuModalItem}>Akun Saya</Text>
+              <Icon name="ios-exit-outline" size={30} style={{top:5}}/>
+              <Text style={styles.menuModalItem}>Logout</Text>
             </View>
           </TouchableOpacity>
       )
@@ -93,11 +95,9 @@ class SidebarModal extends Component {
           onBackdropPress={hideModal}
           style={styles.menuModal}
         >
-          <TouchableWithoutFeedback onPress={this.triggerDeveloperMenu}>
-            <View style={styles.menuModalContainer}>
-              {signInMenus}
-            </View>
-          </TouchableWithoutFeedback>
+          <View style={styles.menuModalContainer}>
+            {signInMenus}
+          </View>
         </Modal>
       </TouchableWithoutFeedback>
     )

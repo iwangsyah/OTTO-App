@@ -16,32 +16,26 @@ import {
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import _ from 'lodash'
+import { connect } from 'react-redux'
 import listingStyles from '../../styles/listing'
 import layoutStyles from '../../styles/layout'
 import styles from '../../styles/home'
 import { setDataFetch } from '../../actions/dataPlat'
-import { connect } from 'react-redux'
-import lodash from 'lodash'
+import SideBarModal from '../SideBarModal'
+import { menuSetVisibility } from '../../actions/sidebar'
 
 const barsIcon = (<Icon name="bars" size={30} color="black" />)
 const searchIcon = (<Icon name="search" size={20} color="black" style={{alignSelf: 'center'}}/>)
 
-export default class Home extends Component {
+export class Home extends Component {
   constructor(props) {
-    AsyncStorage.getItem('name', (error, result) => {
-    if (result) {
-      this.setState({
-            name: result
-      });
-    }
-  });
     super(props)
     this.state = {
       searchText: null,
       articles: [],
       articles1: [],
       fetch: false,
-      search:[]
+      search: []
     }
     this.getArticles = this.getArticles.bind(this)
     this.renderRow = this.renderRow.bind(this)
@@ -146,13 +140,13 @@ export default class Home extends Component {
   }
 
   renderHeader() {
+  let { showMenu } = this.props
     let { search } = this.state
 
     return (
       <View style={styles.container}>
-
         <View style={styles.container1}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={showMenu}>
           {barsIcon}
         </TouchableOpacity>
           <View style={{width:'70%'}}>
@@ -172,7 +166,7 @@ export default class Home extends Component {
             </View>
           </TouchableOpacity>
         </View>
-
+        <SideBarModal/>
       </View>
     )
   }
@@ -222,3 +216,22 @@ keyExtractor(data) {
     );
   }
 }
+
+let mapStateToProps = (state, props) => {
+  return {
+    visible: state.sidebarModal.visible,
+  }
+}
+
+let mapDispatchToProps = (dispatch) => {
+  return {
+    showMenu: () => {
+      dispatch(menuSetVisibility(true))
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Home)

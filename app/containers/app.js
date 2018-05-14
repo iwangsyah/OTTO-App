@@ -11,6 +11,7 @@ import { connect, Provider } from 'react-redux'
 import LoginScreen from '../components/screens/LoginScreen'
 import Home from '../components/screens/Home'
 import DetailScreen from '../components/screens/DetailScreen'
+import KontakScreen from '../components/screens/KontakScreen'
 import store from '../store'
 
 
@@ -36,6 +37,11 @@ export default class DemoApp extends React.Component {
             <Scene key='detail'
                    component={DetailScreen}
                    title='DetailScreen'
+                   panHandlers={null}
+                   hideNavBar={true} />
+            <Scene key='kontak'
+                   component={KontakScreen}
+                   title='KontakScreen'
                    panHandlers={null}
                    hideNavBar={true} />
           </Scene>

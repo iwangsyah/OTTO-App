@@ -3,7 +3,6 @@ import { combineReducers } from 'redux'
 
 import * as types from '../constants/action-types'
 import sidebarModal from './sidebarModal'
-import loginScreen from './loginScreen'
 import dataPlat from './dataPlat'
 import routes from './routes'
 
@@ -24,7 +23,7 @@ const appReducer = combineReducers({
   // selectResidentScreen,
   // residentSignatureScreen,
   // copyRoomScreen,
-  // sidebarModal
+  sidebarModal
   // loginScreen
 })
 
