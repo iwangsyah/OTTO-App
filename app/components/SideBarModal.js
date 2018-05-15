@@ -24,7 +24,9 @@ class SidebarModal extends Component {
     }
 
     this.gotoHome = this.gotoHome.bind(this)
+    this.gotoUpdate = this.gotoUpdate.bind(this)
     this.gotoKontak = this.gotoKontak.bind(this)
+    this.gotoDeviceInfo = this.gotoDeviceInfo.bind(this)
     this.logout = this.logout.bind(this)
   }
 
@@ -32,9 +34,19 @@ class SidebarModal extends Component {
     this.props.hideModal()
   }
 
+  gotoUpdate() {
+    Actions.home({update: true})
+    this.props.hideModal()
+  }
+
   gotoKontak() {
     this.props.hideModal()
     Actions.kontak()
+  }
+
+  gotoDeviceInfo() {
+    this.props.hideModal()
+    Actions.deviceInfo()
   }
 
   logout() {
@@ -58,6 +70,15 @@ class SidebarModal extends Component {
       )
 
       signInMenus.push(
+        <TouchableOpacity onPress={this.gotoUpdate}>
+          <View style={styles.titleContainer}>
+            <Icon name="ios-sync-outline" size={25} style={{top:5}} style={{top:5}}/>
+            <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Update</Text>
+          </View>
+        </TouchableOpacity>
+      )
+
+      signInMenus.push(
           <TouchableOpacity onPress={this.gotoKontak}>
             <View style={styles.titleContainer}>
               <Icon name="ios-call-outline" size={30} style={{top:5}}/>
@@ -76,7 +97,7 @@ class SidebarModal extends Component {
       )
 
       signInMenus.push(
-          <TouchableOpacity onPress={this.gotoBantuan}>
+          <TouchableOpacity onPress={this.gotoDeviceInfo}>
             <View style={styles.titleContainer}>
               <Icon name="ios-information-circle-outline" size={30} style={{top:5}}/>
               <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Device Info</Text>

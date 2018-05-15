@@ -17,7 +17,6 @@ class LogStore {
   }
 
   async save() {
-    console.log('asa.');
     try {
       let historyJson = JSON.stringify(this.history)
       await AsyncStorage.setItem(STORAGE_KEY, historyJson)

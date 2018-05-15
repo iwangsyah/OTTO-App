@@ -79,7 +79,7 @@ export default class LoginScreen extends Component {
     let { status } = this.state
     let warning = null
 
-    if (status != "sukses") {
+    if (status && status != "sukses") {
       warning = (
         <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
           <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username atau Password Salah</Text>

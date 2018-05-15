@@ -11,7 +11,8 @@ import {
   WebView,
   Linking,
   Button,
-  AsyncStorage
+  AsyncStorage,
+  NativeModules
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -35,7 +36,8 @@ export class Home extends Component {
       articles: [],
       articles1: [],
       fetch: false,
-      search: []
+      search: [],
+      update: false
     }
     this.getArticles = this.getArticles.bind(this)
     this.renderRow = this.renderRow.bind(this)
@@ -47,14 +49,18 @@ export class Home extends Component {
   }
 
   componentDidMount() {
-    AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
-      let data = JSON.parse(dataPlat)
-      if (data && data.length != 0) {
-        this.setState({articles: data, articles1: data})
-      } else {
-        this.getArticles()
-      }
-    })
+    if (this.props.update) {
+      this.getArticles()
+    } else {
+      AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
+        let data = JSON.parse(dataPlat)
+        if (data && data.length != 0) {
+          this.setState({articles: data, articles1: data})
+        } else {
+          this.getArticles()
+        }
+      })
+    }
   }
 
   onChangeTextSearch(text) {
@@ -158,7 +164,9 @@ export class Home extends Component {
               placeholderTextColor='lightgrey'
               onChangeText={this.onChangeTextSearch.bind(this)}
               value={this.state.searchText ? this.state.searchText.toUpperCase() : null}
-              keyboardType='ascii-capable'/>
+              keyboardType='ascii-capable'
+              returnKeyType="search"
+              onSubmitEditing={this.onSearch}/>
           </View>
           <TouchableOpacity onPress={this.onSearch}>
             <View style={{backgroundColor:'rgb(0, 185, 230)', width: 35, height:35, borderRadius: 17.5, justifyContent: 'center'}}>

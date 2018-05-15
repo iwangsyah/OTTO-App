@@ -12,6 +12,7 @@ import LoginScreen from '../components/screens/LoginScreen'
 import Home from '../components/screens/Home'
 import DetailScreen from '../components/screens/DetailScreen'
 import KontakScreen from '../components/screens/KontakScreen'
+import DeviceInfo from '../components/screens/DeviceInfo'
 import store from '../store'
 
 
@@ -30,6 +31,7 @@ export default class DemoApp extends React.Component {
                    panHandlers={null}
                    hideNavBar={true} />
             <Scene key='home'
+                   initial
                    component={Home}
                    title='Home'
                    panHandlers={null}
@@ -42,6 +44,11 @@ export default class DemoApp extends React.Component {
             <Scene key='kontak'
                    component={KontakScreen}
                    title='KontakScreen'
+                   panHandlers={null}
+                   hideNavBar={true} />
+            <Scene key='deviceInfo'
+                   component={DeviceInfo}
+                   title='DeviceInfo'
                    panHandlers={null}
                    hideNavBar={true} />
           </Scene>

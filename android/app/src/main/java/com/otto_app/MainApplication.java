@@ -3,6 +3,9 @@ package com.otto_app;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.github.hush2.RNAndroidDeviceInfo.RNAndroidDeviceInfoPackage;
+import codes.simen.IMEI.IMEI;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.ReactNativeHost;
@@ -25,6 +28,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNAndroidDeviceInfoPackage(),
+            new IMEI(),
+            new RNDeviceInfo(),
             new VectorIconsPackage(),
             new LinearGradientPackage()
       );

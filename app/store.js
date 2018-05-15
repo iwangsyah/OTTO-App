@@ -54,7 +54,6 @@ const offlineSupportAutoSyncFilter = createWhitelistFilter(
 
 
 export function createPersistor(userId, callback) {
-  console.log('kenadeh');
   persistor = persistStore(store, {
     storage: AsyncStorage,
     keyPrefix: 'root',
