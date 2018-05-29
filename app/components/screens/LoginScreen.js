@@ -133,6 +133,7 @@ export default class LoginScreen extends Component {
               placeholder="Password"
               placeholderTextColor="#ffffff"
               secureTextEntry={true}
+              autoCapitalize="none"
               onChangeText={this.onChangePassword.bind(this)}
               style={styles.textInput}
             />
