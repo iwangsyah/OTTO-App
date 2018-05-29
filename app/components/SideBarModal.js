@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import {
-  View, Text, TouchableOpacity, TouchableWithoutFeedback
+  View, Text, TouchableOpacity, TouchableWithoutFeedback, AsyncStorage
 } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { connect } from 'react-redux'
@@ -50,61 +50,13 @@ class SidebarModal extends Component {
   }
 
   logout() {
+    AsyncStorage.setItem('logged', JSON.stringify("LoggedOut"))
     this.props.hideModal()
     Actions.login()
   }
 
   render() {
     let { visible, signedIn, hideModal } = this.props
-    let { showDeveloperMenu } = this.state
-
-    let signInMenus = []
-
-      signInMenus.push(
-        <TouchableOpacity onPress={this.gotoHome}>
-          <View style={styles.titleContainer}>
-            <Icon name="ios-home-outline" size={30} style={{top:5}} style={{top:5}}/>
-            <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Home</Text>
-          </View>
-        </TouchableOpacity>
-      )
-
-      signInMenus.push(
-        <TouchableOpacity onPress={this.gotoUpdate}>
-          <View style={styles.titleContainer}>
-            <Icon name="ios-sync-outline" size={25} style={{top:5}} style={{top:5}}/>
-            <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Update</Text>
-          </View>
-        </TouchableOpacity>
-      )
-
-      signInMenus.push(
-          <TouchableOpacity onPress={this.gotoKontak}>
-            <View style={styles.titleContainer}>
-              <Icon name="ios-call-outline" size={30} style={{top:5}}/>
-              <Text style={styles.menuModalItem}>Kontak</Text>
-            </View>
-          </TouchableOpacity>
-      )
-
-      signInMenus.push(
-          <TouchableOpacity onPress={this.logout}>
-            <View style={styles.titleContainer}>
-              <Icon name="ios-exit-outline" size={30} style={{top:5}}/>
-              <Text style={styles.menuModalItem}>Logout</Text>
-            </View>
-          </TouchableOpacity>
-      )
-
-      signInMenus.push(
-          <TouchableOpacity onPress={this.gotoDeviceInfo}>
-            <View style={styles.titleContainer}>
-              <Icon name="ios-information-circle-outline" size={30} style={{top:5}}/>
-              <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Device Info</Text>
-            </View>
-          </TouchableOpacity>
-      )
-
 
     return (
       <TouchableWithoutFeedback>
@@ -117,7 +69,36 @@ class SidebarModal extends Component {
           style={styles.menuModal}
         >
           <View style={styles.menuModalContainer}>
-            {signInMenus}
+            <TouchableOpacity onPress={this.gotoHome}>
+              <View style={styles.titleContainer}>
+                <Icon name="ios-home-outline" size={30} style={{top:5}} style={{top:5}}/>
+                <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Home</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.gotoUpdate}>
+              <View style={styles.titleContainer}>
+                <Icon name="ios-sync-outline" size={25} style={{top:5}} style={{top:5}}/>
+                <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Update</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.gotoKontak}>
+              <View style={styles.titleContainer}>
+                <Icon name="ios-call-outline" size={30} style={{top:5}}/>
+                <Text style={styles.menuModalItem}>Kontak</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.logout}>
+              <View style={styles.titleContainer}>
+                <Icon name="ios-exit-outline" size={30} style={{top:5}}/>
+                <Text style={styles.menuModalItem}>Logout</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.gotoDeviceInfo}>
+              <View style={styles.titleContainer}>
+                <Icon name="ios-information-circle-outline" size={30} style={{top:5}}/>
+                <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Device Info</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </Modal>
       </TouchableWithoutFeedback>

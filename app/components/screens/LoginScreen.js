@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   Platform,
+  AsyncStorage,
   TouchableOpacity,
   StyleSheet,
   TextInput,
@@ -29,16 +30,19 @@ export default class LoginScreen extends Component {
     this.login = this.login.bind(this)
   }
 
+  componentDidMount() {
+    this.setState({imei: DeviceInfo.getSerialNumber()})
+  }
+
   login() {
     let { username, password, imei } = this.state
     if (password) {
       password = md5(password)
     }
-    this.checkLogin()
+    this.checkLogin(username, password, imei)
   }
 
-  async checkLogin() {
-    let { username, password } = this.state
+  async checkLogin(username, password, imei) {
     try {
       let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
 			method:'post',
@@ -50,6 +54,7 @@ export default class LoginScreen extends Component {
 				// we will pass our input data to server
         "username":username,
         "password":password,
+        "phone_imei":imei
 			})
 
 		})
@@ -57,10 +62,17 @@ export default class LoginScreen extends Component {
       if (responseJson.error) {
         console.log(responseJson.error);
       } else {
+        console.log(responseJson);
         if (responseJson == "sukses") {
+          AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
           Actions.home()
         }
         this.setState({status: responseJson})
+        if (responseJson != 'sukses') {
+          setTimeout(() => {
+            this.setState({status: null})
+          },2000)
+        }
       }
     } catch (error) {
       console.log(error);
@@ -78,13 +90,20 @@ export default class LoginScreen extends Component {
   render() {
     let { status } = this.state
     let warning = null
-
-    if (status && status != "sukses") {
-      warning = (
-        <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
-          <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username atau Password Salah</Text>
-        </View>
-      )
+    if (status) {
+      if (status == "salah") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username atau Password Salah</Text>
+          </View>
+        )
+      } else if (status == "beda") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Akun sudah digunakan di HP lain</Text>
+          </View>
+        )
+      }
     }
 
     return (
@@ -93,19 +112,20 @@ export default class LoginScreen extends Component {
             OTTO APP
           </Text>
           <View style={styles.textInputContainer}>
-            <View style={{top: 15}}>
+            <View style={{top: 5}}>
               <Icon name="ios-person" size={30} color="#ffffff" />
             </View>
             <TextInput
               underlineColorAndroid = "transparent"
               placeholder="Username"
               placeholderTextColor="#ffffff"
+              autoCapitalize="none"
               onChangeText={this.onChangeUsername.bind(this)}
               style={styles.textInput}
             />
           </View>
           <View style={styles.textInputContainer}>
-            <View style={{top: 15}}>
+            <View style={{top: 5}}>
               <Icon name="ios-lock" size={30} color="#ffffff" />
             </View>
             <TextInput

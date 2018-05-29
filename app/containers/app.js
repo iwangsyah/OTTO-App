@@ -8,6 +8,7 @@ import {
 
 import { Router, Scene, Stack } from 'react-native-router-flux'
 import { connect, Provider } from 'react-redux'
+import SplashScreen from '../components/screens/SplashScreen'
 import LoginScreen from '../components/screens/LoginScreen'
 import Home from '../components/screens/Home'
 import DetailScreen from '../components/screens/DetailScreen'
@@ -25,13 +26,17 @@ export default class DemoApp extends React.Component {
       <Provider store={store}>
         <RouterWithRedux>
           <Scene key="root">
+            <Scene key='splash'
+                   component={SplashScreen}
+                   title='SplashScreen'
+                   panHandlers={null}
+                   hideNavBar={true} />
             <Scene key='login'
                    component={LoginScreen}
                    title='LoginScreen'
                    panHandlers={null}
                    hideNavBar={true} />
             <Scene key='home'
-                   initial
                    component={Home}
                    title='Home'
                    panHandlers={null}

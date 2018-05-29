@@ -41,6 +41,7 @@ export class Home extends Component {
     }
     this.getArticles = this.getArticles.bind(this)
     this.renderRow = this.renderRow.bind(this)
+    this.searchValidation = this.searchValidation.bind(this)
     this.onSearch = this.onSearch.bind(this)
   }
 
@@ -103,6 +104,15 @@ export class Home extends Component {
     Actions.detail({ item: article.item })
   }
 
+  searchValidation() {
+    let { searchText } = this.state
+    if (searchText && searchText.length > 1) {
+      this.onSearch()
+    } else {
+      alert('Kata kunci harus lebih dari satu karakter')
+    }
+  }
+
   onSearch() {
     let { searchText, articles, articles1 } = this.state
     let platS = _.map(this.state.articles1, 'plat');
@@ -152,7 +162,7 @@ export class Home extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.container1}>
-        <TouchableOpacity onPress={showMenu}>
+        <TouchableOpacity style={{width:50}} onPress={showMenu}>
           {barsIcon}
         </TouchableOpacity>
           <View style={{width:'70%'}}>
@@ -164,11 +174,12 @@ export class Home extends Component {
               placeholderTextColor='lightgrey'
               onChangeText={this.onChangeTextSearch.bind(this)}
               value={this.state.searchText ? this.state.searchText.toUpperCase() : null}
+              autoCapitalize="characters"
               keyboardType='ascii-capable'
               returnKeyType="search"
-              onSubmitEditing={this.onSearch}/>
+              onSubmitEditing={this.searchValidation}/>
           </View>
-          <TouchableOpacity onPress={this.onSearch}>
+          <TouchableOpacity onPress={this.searchValidation}>
             <View style={{backgroundColor:'rgb(0, 185, 230)', width: 35, height:35, borderRadius: 17.5, justifyContent: 'center'}}>
               {searchIcon}
             </View>
