@@ -56,7 +56,7 @@ export default class DetailScreen extends Component {
             alignSelf:'center',
             alignItems: 'center',
             borderRadius: 20,
-            bottom:20}}>
+            bottom:30}}>
             <Text style={styles.text4}>Kembali Ke Pencarian</Text>
         </TouchableOpacity>
       </View>

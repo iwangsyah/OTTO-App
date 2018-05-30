@@ -27,7 +27,6 @@ export default class SplashScreen extends Component {
     setTimeout(() => {
     AsyncStorage.getItem('logged').then((loginStatus)=>{
       let log = JSON.parse(loginStatus)
-      console.log('log: ', log);
         if (log == "LoggedIn") {
           Actions.home()
         } else  {

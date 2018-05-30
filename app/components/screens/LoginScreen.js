@@ -112,7 +112,7 @@ export default class LoginScreen extends Component {
             OTTO APP
           </Text>
           <View style={styles.textInputContainer}>
-            <View style={{top: 5}}>
+            <View style={{top: 15}}>
               <Icon name="ios-person" size={30} color="#ffffff" />
             </View>
             <TextInput
@@ -125,7 +125,7 @@ export default class LoginScreen extends Component {
             />
           </View>
           <View style={styles.textInputContainer}>
-            <View style={{top: 5}}>
+            <View style={{top: 15}}>
               <Icon name="ios-lock" size={30} color="#ffffff" />
             </View>
             <TextInput

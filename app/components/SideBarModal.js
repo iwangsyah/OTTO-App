@@ -71,19 +71,19 @@ class SidebarModal extends Component {
           <View style={styles.menuModalContainer}>
             <TouchableOpacity onPress={this.gotoHome}>
               <View style={styles.titleContainer}>
-                <Icon name="ios-home-outline" size={30} style={{top:5}} style={{top:5}}/>
+                <Icon name="ios-home-outline" size={30} style={{top:5}} style={{top:15}}/>
                 <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Home</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={this.gotoUpdate}>
               <View style={styles.titleContainer}>
-                <Icon name="ios-sync-outline" size={25} style={{top:5}} style={{top:5}}/>
+                <Icon name="ios-sync-outline" size={25} style={{top:5}} style={{top:15}}/>
                 <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Update</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={this.gotoKontak}>
               <View style={styles.titleContainer}>
-                <Icon name="ios-call-outline" size={30} style={{top:5}}/>
+                <Icon name="ios-call-outline" size={30} style={{top:15}}/>
                 <Text style={styles.menuModalItem}>Kontak</Text>
               </View>
             </TouchableOpacity>
@@ -95,7 +95,7 @@ class SidebarModal extends Component {
             </TouchableOpacity>
             <TouchableOpacity onPress={this.gotoDeviceInfo}>
               <View style={styles.titleContainer}>
-                <Icon name="ios-information-circle-outline" size={30} style={{top:5}}/>
+                <Icon name="ios-information-circle-outline" size={30} style={{top:15}}/>
                 <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Device Info</Text>
               </View>
             </TouchableOpacity>
