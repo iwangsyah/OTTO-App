@@ -34,12 +34,30 @@ export default class LoginScreen extends Component {
     this.setState({imei: DeviceInfo.getSerialNumber()})
   }
 
-  login() {
+  async checkConnection() {
+    let status = null
+    try {
+      const res = await fetch('https://prod.facilgo.com/');
+      if (res.status === 200) {
+        status = true;
+      }
+    } catch (e) {
+      status = false;
+    }
+    return status
+  }
+
+  async login() {
     let { username, password, imei } = this.state
+    let conn = await this.checkConnection()
     if (password) {
       password = md5(password)
     }
-    this.checkLogin(username, password, imei)
+    if (conn) {
+      this.checkLogin(username, password, imei)
+    } else {
+      alert('Tidak bisa terhubung ke server.\nPeriksa koneksi internet anda!')
+    }
   }
 
   async checkLogin(username, password, imei) {
@@ -61,8 +79,8 @@ export default class LoginScreen extends Component {
       let responseJson = await response.json()
       if (responseJson.error) {
         console.log(responseJson.error);
+        alert('Terjadi kesalahan koneksi ke server')
       } else {
-        console.log(responseJson);
         if (responseJson == "sukses") {
           AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
           Actions.home()
@@ -71,7 +89,7 @@ export default class LoginScreen extends Component {
         if (responseJson != 'sukses') {
           setTimeout(() => {
             this.setState({status: null})
-          },2000)
+          },2500)
         }
       }
     } catch (error) {

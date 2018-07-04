@@ -83,6 +83,7 @@ export class Home extends Component {
       let responseJson = await response.json()
       if (responseJson.error) {
         console.log(responseJson.error);
+        alert('Terjadi kesalahan saat koneksi ke server')
       } else {
         let articles = responseJson
         AsyncStorage.setItem('dataPlat', JSON.stringify(articles))

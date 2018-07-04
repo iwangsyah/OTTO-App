@@ -30,13 +30,31 @@ class SidebarModal extends Component {
     this.logout = this.logout.bind(this)
   }
 
+  async checkConnection() {
+    let status = null
+    try {
+      const res = await fetch('https://prod.facilgo.com/');
+      if (res.status === 200) {
+        status = true;
+      }
+    } catch (e) {
+      status = false;
+    }
+    return status
+  }
+
   gotoHome() {
     this.props.hideModal()
   }
 
-  gotoUpdate() {
-    Actions.home({update: true})
-    this.props.hideModal()
+  async gotoUpdate() {
+    let conn = await this.checkConnection()
+    if (conn) {
+      Actions.home({update: true})
+      this.props.hideModal()
+    } else {
+      alert('Tidak bisa mengupdate data.\nPeriksa koneksi internet anda!')
+    }
   }
 
   gotoKontak() {
