@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   View,
   Text,
+  Linking,
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
@@ -49,6 +50,9 @@ export default class KontakScreen extends Component {
                     </View>
                 </TouchableOpacity>
           </View>
+          <TouchableOpacity onPress={() => Linking.canOpenURL('whatsapp://app')}>
+            <Text>WA</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={this.back.bind(this)}
             style={{
               marginTop:30,
@@ -60,7 +64,7 @@ export default class KontakScreen extends Component {
               alignItems: 'center',
               borderRadius: 20,
               bottom:70}}>
-              <Text style={styles.text4}>Kembali Ke Pencarian</Text>
+              <Text style={styles.text4}>Kembali Ke Login</Text>
           </TouchableOpacity>
         </View>
       </View>

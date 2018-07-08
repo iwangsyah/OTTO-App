@@ -111,12 +111,6 @@ class SidebarModal extends Component {
                 <Text style={styles.menuModalItem}>Logout</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.gotoDeviceInfo}>
-              <View style={styles.titleContainer}>
-                <Icon name="ios-information-circle-outline" size={30} style={{top:15}}/>
-                <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Device Info</Text>
-              </View>
-            </TouchableOpacity>
           </View>
         </Modal>
       </TouchableWithoutFeedback>

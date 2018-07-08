@@ -97,12 +97,17 @@ export default class LoginScreen extends Component {
     }
   }
 
+
   onChangeUsername(text) {
     this.setState({ username: text})
   }
 
   onChangePassword(text) {
     this.setState({ password: text })
+  }
+
+  gotoKontak() {
+    Actions.daftar()
   }
 
   render() {
@@ -160,6 +165,12 @@ export default class LoginScreen extends Component {
               <Text style={styles.textLogin}>Log In</Text>
           </TouchableOpacity>
           {warning}
+          <View style={{flexDirection:'row', top:10}}>
+            <Text style={{fontWeight:'bold', color:'#ffffff'}}> Belum punya akun ? </Text>
+            <TouchableOpacity onPress={this.gotoKontak}>
+              <Text style={{fontWeight:'bold', color:'#841584'}}> Daftar</Text>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
     );
   }
