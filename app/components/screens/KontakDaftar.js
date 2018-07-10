@@ -1,109 +1,199 @@
 import React, { Component } from 'react';
 import {
-  View,
-  Text,
-  Linking,
+  Platform,
+  AsyncStorage,
+  TouchableOpacity,
   StyleSheet,
-  TouchableOpacity
+  TextInput,
+  Button,
+  Text,
+  View
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/Ionicons'
 import { Actions } from 'react-native-router-flux'
-import Icon from 'react-native-vector-icons/Ionicons';
-import Communications from 'react-native-communications'
+import Modal from 'react-native-modal'
+import { connect } from 'react-redux'
+import DeviceInfo from 'react-native-device-info';
+import styles from '../../styles/loginScreen'
+const md5 = require('js-md5');
 
-
-export default class KontakScreen extends Component {
-
-  back() {
-    Actions.pop()
+export default class LoginScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: null,
+      password: null,
+      imei: null,
+      status: null,
+    }
+    this.login = this.login.bind(this)
   }
 
-  renderHeader() {
-    return (
-      <View style={styles.containerHeader}>
-        <Text style={styles.text3}> Kontak </Text>
-      </View>
-    )
+  componentDidMount() {
+    this.setState({imei: DeviceInfo.getSerialNumber()})
+  }
+
+  async checkConnection() {
+    let status = null
+    try {
+      const res = await fetch('http://tokosibuk.com/');
+      if (res.status === 200) {
+        status = true;
+      }
+    } catch (e) {
+      status = false;
+    }
+    return status
+  }
+
+  async login() {
+    let { username, password, imei } = this.state
+    let conn = await this.checkConnection()
+    if (password) {
+      password = md5(password)
+    }
+    if (conn) {
+      this.checkLogin(username, password, imei)
+    } else {
+      alert('Tidak bisa terhubung ke server.\nPeriksa koneksi internet anda!')
+    }
+  }
+
+  async checkLogin(username, password, imei) {
+    try {
+      let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
+			method:'post',
+			header:{
+				'Accept': 'application/json',
+				'Content-type': 'application/json'
+			},
+			body:JSON.stringify({
+				// we will pass our input data to server
+        "username":username,
+        "password":password,
+        "phone_imei":imei
+			})
+
+		})
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+        alert('Terjadi kesalahan koneksi ke server')
+      } else {
+        if (responseJson == "sukses") {
+          AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
+          Actions.home()
+        }
+        this.setState({status: responseJson})
+        if (responseJson != 'sukses') {
+          setTimeout(() => {
+            this.setState({status: null})
+          },2500)
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  onChangeUsername(text) {
+    this.setState({ username: text})
+  }
+
+  onChangePassword(text) {
+    this.setState({ password: text })
+  }
+
+  gotoKontak() {
+    Actions.daftar()
   }
 
   render() {
-    let { item } = this.props
-    return(
-      <View>
-        <View style={{backgroundColor:'#ffffff', height:'100%', flexDirection:'column', justifyContent:'space-between'}}>
-        {this.renderHeader()}
-          <View style={{margin:10}}>
-                <Text style={styles.text1}>Bpk. Wahyu</Text>
-                <Text style={styles.text2}>0819 0805 7587</Text>
-                <TouchableOpacity onPress={() => Communications.phonecall('081908057587', true)}
-                style={{
-                  marginTop:30,
-                  padding:10,
-                  backgroundColor:'green',
-                  width: 150,
-                  justifyContent:'center',
-                  alignSelf:'center',
-                  alignItems: 'center',
-                  borderRadius: 20}}>
-                    <View style={{flexDirection:'row', alignItems:'center'}}>
-                      <Icon name="ios-call-outline" size={40} color="#ffffff" style={{marginRight:10}}/>
-                      <Text style={styles.text4}>Panggil</Text>
-                    </View>
-                </TouchableOpacity>
+    let { status } = this.state
+    let warning = null
+    if (status) {
+      if (status == "salah") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username atau Password Salah</Text>
           </View>
-          <TouchableOpacity onPress={() => Linking.canOpenURL('whatsapp://app')}>
-            <Text>WA</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={this.back.bind(this)}
-            style={{
-              marginTop:30,
-              padding: 10,
-              backgroundColor:'#c661e8',
-              width: '80%',
-              justifyContent:'center',
-              alignSelf:'center',
-              alignItems: 'center',
-              borderRadius: 20,
-              bottom:70}}>
-              <Text style={styles.text4}>Kembali Ke Login</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
-  }
+        )
+      } else if (status == "beda") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Akun sudah digunakan di HP lain</Text>
+          </View>
+        )
+      }
+    }
 
+    return (
+        <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
+          <Text style={styles.buttonText}>
+            DAFTAR
+          </Text>
+          <View style={styles.textInputContainer}>
+            <View style={{top: 15}}>
+              <Icon name="ios-person" size={30} color="#ffffff" />
+            </View>
+            <TextInput
+              underlineColorAndroid = "transparent"
+              placeholder="Username"
+              placeholderTextColor="#ffffff"
+              autoCapitalize="none"
+              onChangeText={this.onChangeUsername.bind(this)}
+              style={styles.textInput}
+            />
+          </View>
+          <View style={styles.textInputContainer}>
+            <View style={{top: 15}}>
+              <Icon name="ios-lock" size={30} color="#ffffff" />
+            </View>
+            <TextInput
+              underlineColorAndroid = "transparent"
+              placeholder="Password"
+              placeholderTextColor="#ffffff"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              onChangeText={this.onChangePassword.bind(this)}
+              style={styles.textInput}
+            />
+          </View>
+          <View style={styles.textInputContainer}>
+            <View style={{top: 15}}>
+              <Icon name="ios-lock" size={30} color="#ffffff" />
+            </View>
+            <TextInput
+              underlineColorAndroid = "transparent"
+              placeholder="Ulangi Password"
+              placeholderTextColor="#ffffff"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              onChangeText={this.onChangePassword.bind(this)}
+              style={styles.textInput}
+            />
+          </View>
+          <View style={styles.textInputContainer}>
+            <View style={{top: 15}}>
+              <Icon name="ios-mail" size={30} color="#ffffff" />
+            </View>
+            <TextInput
+              underlineColorAndroid = "transparent"
+              placeholder="Email"
+              placeholderTextColor="#ffffff"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              onChangeText={this.onChangePassword.bind(this)}
+              style={styles.textInput}
+            />
+          </View>
+          <TouchableOpacity onPress={this.login} style={styles.buttonLogin}>
+              <Text style={styles.textLogin}>Daftar</Text>
+          </TouchableOpacity>
+          {warning}
+        </LinearGradient>
+    );
+  }
 }
-
-const styles = StyleSheet.create({
-  containerHeader: {
-    backgroundColor: '#c661e8',
-    flexDirection: 'row',
-    justifyContent:'center',
-    height: 70,
-    padding: 10,
-    paddingTop: 20,
-  },
-  text1: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    alignSelf:'center',
-    color:'#000000'
-  },
-  text2: {
-    fontSize: 30,
-    marginTop: 10,
-    color:'blue',
-    fontWeight:'bold',
-    alignSelf:'center'
-  },
-  text3: {
-    fontSize:30,
-    fontWeight:'bold',
-    color:'#ffffff',
-    alignSelf:'center'
-  },
-  text4: {
-    fontSize:20,
-    fontWeight:'bold',
-    color:'#ffffff',
-  }
-});

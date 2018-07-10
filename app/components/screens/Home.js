@@ -46,6 +46,10 @@ export class Home extends Component {
   }
 
   componentDidMount() {
+    AsyncStorage.getItem('userLogged').then((id)=>{
+      id = Number(JSON.parse(id))
+      this.checkActiveStatus(id)
+    })
     if (this.props.update) {
       this.getArticles()
     } else {
@@ -64,6 +68,37 @@ export class Home extends Component {
     this.setState({
       searchText: text
     })
+  }
+
+  async checkActiveStatus(id) {
+    try {
+      let response = await fetch('http://tokosibuk.com/v1/check_expired.php',{
+			method:'POST',
+			header:{
+				'Accept': 'application/json',
+				'Content-type': 'application/json'
+			},
+			body:JSON.stringify({
+				// we will pass our input data to server
+        "id":id
+			})
+
+		})
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+        alert('Terjadi kesalahan koneksi ke server')
+      } else {
+        if (responseJson == "Tidak Aktif") {
+          alert('Akun anda sudah tidak aktif')
+          AsyncStorage.setItem('logged', JSON.stringify("LoggedOut"))
+          AsyncStorage.setItem('userLogged', JSON.stringify(null))
+          Actions.login()
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getArticles() {

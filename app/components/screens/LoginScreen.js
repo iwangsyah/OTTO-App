@@ -34,10 +34,19 @@ export default class LoginScreen extends Component {
     this.setState({imei: DeviceInfo.getSerialNumber()})
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.status !== this.state.status) {
+      console.log('1');
+      setTimeout(() => {
+      console.log('I do not leak!');
+    }, 500);
+    }
+  }
+
   async checkConnection() {
     let status = null
     try {
-      const res = await fetch('https://prod.facilgo.com/');
+      const res = await fetch('http://tokosibuk.com/');
       if (res.status === 200) {
         status = true;
       }
@@ -61,9 +70,10 @@ export default class LoginScreen extends Component {
   }
 
   async checkLogin(username, password, imei) {
+    console.log('adsa');
     try {
       let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
-			method:'post',
+			method:'POST',
 			header:{
 				'Accept': 'application/json',
 				'Content-type': 'application/json'
@@ -81,15 +91,17 @@ export default class LoginScreen extends Component {
         console.log(responseJson.error);
         alert('Terjadi kesalahan koneksi ke server')
       } else {
-        if (responseJson == "sukses") {
-          AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
-          Actions.home()
-        }
-        this.setState({status: responseJson})
-        if (responseJson != 'sukses') {
-          setTimeout(() => {
-            this.setState({status: null})
-          },2500)
+        console.log('res: ', responseJson.status);
+        if (responseJson.status) {
+          if (responseJson.status == "Aktif") {
+            AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
+            console.log(responseJson.id);
+            AsyncStorage.setItem('userLogged', JSON.stringify(responseJson.id))
+            Actions.home()
+          }
+          this.setState({status: responseJson.status})
+        } else {
+          this.setState({status: responseJson})
         }
       }
     } catch (error) {
@@ -112,6 +124,7 @@ export default class LoginScreen extends Component {
 
   render() {
     let { status } = this.state
+    console.log('status: ', status);
     let warning = null
     if (status) {
       if (status == "salah") {
@@ -124,6 +137,12 @@ export default class LoginScreen extends Component {
         warning = (
           <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
             <Text style={{fontWeight:'bold', alignSelf:'center'}}>Akun sudah digunakan di HP lain</Text>
+          </View>
+        )
+      } else if (status == "Tidak Aktif") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Akun anda tidak aktif</Text>
           </View>
         )
       }

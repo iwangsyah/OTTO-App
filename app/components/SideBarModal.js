@@ -69,6 +69,7 @@ class SidebarModal extends Component {
 
   logout() {
     AsyncStorage.setItem('logged', JSON.stringify("LoggedOut"))
+    AsyncStorage.setItem('userLogged', JSON.stringify(null))
     this.props.hideModal()
     Actions.login()
   }
