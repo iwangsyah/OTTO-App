@@ -34,15 +34,6 @@ export default class LoginScreen extends Component {
     this.setState({imei: DeviceInfo.getSerialNumber()})
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.status !== this.state.status) {
-      console.log('1');
-      setTimeout(() => {
-      console.log('I do not leak!');
-    }, 500);
-    }
-  }
-
   async checkConnection() {
     let status = null
     try {
@@ -70,7 +61,6 @@ export default class LoginScreen extends Component {
   }
 
   async checkLogin(username, password, imei) {
-    console.log('adsa');
     try {
       let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
 			method:'POST',
@@ -91,7 +81,6 @@ export default class LoginScreen extends Component {
         console.log(responseJson.error);
         alert('Terjadi kesalahan koneksi ke server')
       } else {
-        console.log('res: ', responseJson.status);
         if (responseJson.status) {
           if (responseJson.status == "Aktif") {
             AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
@@ -102,6 +91,11 @@ export default class LoginScreen extends Component {
           this.setState({status: responseJson.status})
         } else {
           this.setState({status: responseJson})
+        }
+        if (responseJson) {
+          setTimeout(() => {
+            this.setState({status: null})
+          },2500)
         }
       }
     } catch (error) {
@@ -124,7 +118,6 @@ export default class LoginScreen extends Component {
 
   render() {
     let { status } = this.state
-    console.log('status: ', status);
     let warning = null
     if (status) {
       if (status == "salah") {
