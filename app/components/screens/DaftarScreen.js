@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Platform,
   AsyncStorage,
+  ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
   TextInput,
@@ -18,16 +19,21 @@ import DeviceInfo from 'react-native-device-info';
 import styles from '../../styles/loginScreen'
 const md5 = require('js-md5');
 
-export default class LoginScreen extends Component {
+export default class DaftarScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: null,
       password: null,
-      imei: null,
+      passwordConfirm: null,
+      email: null,
+      phone: null,
       status: null,
+      buttonPress: false,
+      press: false
     }
-    this.login = this.login.bind(this)
+    this.daftarValidation = this.daftarValidation.bind(this)
+    this._onDaftar = this._onDaftar.bind(this)
   }
 
   componentDidMount() {
@@ -47,32 +53,67 @@ export default class LoginScreen extends Component {
     return status
   }
 
-  async login() {
-    let { username, password, imei } = this.state
+  handlePress() {
+    if (this.state.press) {
+      return console.log('press denied');
+    } else {
+      return this.daftarValidation()
+    }
+  }
+
+  handlePressBack() {
+    if (this.state.press) {
+      return console.log('press denied');
+    } else {
+      return Actions.pop()
+    }
+  }
+
+  daftarValidation() {
+    let { username, password, passwordConfirm, email, phone } = this.state
+    if (password !== passwordConfirm) {
+      this.setState({status: "not match", passwordConfirm: null})
+    } else if (username && password && passwordConfirm && email && phone) {
+      this.setState({status: "sukses"})
+      this.daftar()
+    } else {
+      this.setState({status: "not fill"})
+    }
+    setTimeout(() => {
+      this.setState({status: null})
+    },2500)
+  }
+
+  async daftar() {
+    this.setState({press: true})
+    let { username, password, email, phone } = this.state
     let conn = await this.checkConnection()
+    let passEncrypt = null
     if (password) {
-      password = md5(password)
+      passEncrypt = md5(password)
     }
     if (conn) {
-      this.checkLogin(username, password, imei)
+      this._onDaftar(username, passEncrypt, email, phone, password)
     } else {
+      this.setState({press: false})
       alert('Tidak bisa terhubung ke server.\nPeriksa koneksi internet anda!')
     }
   }
 
-  async checkLogin(username, password, imei) {
+  async _onDaftar(username, password, email, phone, passDecrypt) {
     try {
-      let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
+      let response = await fetch('http://tokosibuk.com/v1/user_registration.php',{
 			method:'post',
 			header:{
 				'Accept': 'application/json',
 				'Content-type': 'application/json'
 			},
 			body:JSON.stringify({
-				// we will pass our input data to server
         "username":username,
         "password":password,
-        "phone_imei":imei
+        "email":email,
+        "phone":phone,
+        "passDecrypt":passDecrypt
 			})
 
 		})
@@ -81,16 +122,13 @@ export default class LoginScreen extends Component {
         console.log(responseJson.error);
         alert('Terjadi kesalahan koneksi ke server')
       } else {
-        if (responseJson == "sukses") {
-          AsyncStorage.setItem('logged', JSON.stringify("LoggedIn"))
-          Actions.home()
+        this.setState({press: false})
+        if (responseJson == "berhasil") {
+          Actions.daftarSukses({username:username, password:passDecrypt, email:email, phone:phone})
+        } else {
+          alert("Gagal Mendaftar")
         }
-        this.setState({status: responseJson})
-        if (responseJson != 'sukses') {
-          setTimeout(() => {
-            this.setState({status: null})
-          },2500)
-        }
+        this.setState({ buttonPress: false })
       }
     } catch (error) {
       console.log(error);
@@ -106,27 +144,52 @@ export default class LoginScreen extends Component {
     this.setState({ password: text })
   }
 
+  onChangePasswordConfirm(text) {
+    this.setState({ passwordConfirm: text })
+  }
+
+  onChangeEmail(text) {
+    this.setState({ email: text })
+  }
+
+  onChangePhone(text) {
+    this.setState({ phone: text })
+  }
+
   gotoKontak() {
     Actions.daftar()
   }
 
   render() {
-    let { status } = this.state
+    let { status, buttonPress, press } = this.state
     let warning = null
+    let button = null
     if (status) {
-      if (status == "salah") {
+      if (status == "not match") {
         warning = (
           <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
-            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username atau Password Salah</Text>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Password tidak sama</Text>
           </View>
         )
-      } else if (status == "beda") {
+      } else if (status == "not fill") {
         warning = (
           <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
-            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Akun sudah digunakan di HP lain</Text>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Ada form yang belum diisi</Text>
           </View>
         )
       }
+    }
+
+    let icon = null
+    if (press) {
+      icon = (
+        <ActivityIndicator
+          animating={true}
+          style={{height: 80}}
+          size="large" />
+      )
+    } else {
+      icon = null
     }
 
     return (
@@ -171,8 +234,9 @@ export default class LoginScreen extends Component {
               placeholderTextColor="#ffffff"
               secureTextEntry={true}
               autoCapitalize="none"
-              onChangeText={this.onChangePassword.bind(this)}
+              onChangeText={this.onChangePasswordConfirm.bind(this)}
               style={styles.textInput}
+              value={this.state.passwordConfirm}
             />
           </View>
           <View style={styles.textInputContainer}>
@@ -183,16 +247,32 @@ export default class LoginScreen extends Component {
               underlineColorAndroid = "transparent"
               placeholder="Email"
               placeholderTextColor="#ffffff"
-              secureTextEntry={true}
               autoCapitalize="none"
-              onChangeText={this.onChangePassword.bind(this)}
+              onChangeText={this.onChangeEmail.bind(this)}
               style={styles.textInput}
             />
           </View>
-          <TouchableOpacity onPress={this.login} style={styles.buttonLogin}>
+          <View style={styles.textInputContainer}>
+            <View style={{top: 15}}>
+              <Icon name="ios-call" size={30} color="#ffffff" />
+            </View>
+            <TextInput
+              underlineColorAndroid = "transparent"
+              placeholder="No. Handphone"
+              placeholderTextColor="#ffffff"
+              autoCapitalize="none"
+              onChangeText={this.onChangePhone.bind(this)}
+              style={styles.textInput}
+            />
+          </View>
+          {icon}
+          <TouchableOpacity onPress={this.handlePress.bind(this)} style={styles.buttonLogin}>
               <Text style={styles.textLogin}>Daftar</Text>
           </TouchableOpacity>
           {warning}
+          <TouchableOpacity onPress={this.handlePressBack.bind(this)} style={styles.buttonLogin}>
+              <Text style={styles.textLogin}>Kembali</Text>
+          </TouchableOpacity>
         </LinearGradient>
     );
   }

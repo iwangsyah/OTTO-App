@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   View,
   Text,
+  Linking,
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
@@ -25,7 +26,7 @@ export default class KontakScreen extends Component {
   }
 
   render() {
-    let { item } = this.props
+    let { item, text } = this.props
     return(
       <View>
         <View style={{backgroundColor:'#ffffff', height:'100%', flexDirection:'column', justifyContent:'space-between'}}>
@@ -60,7 +61,7 @@ export default class KontakScreen extends Component {
               alignItems: 'center',
               borderRadius: 20,
               bottom:70}}>
-              <Text style={styles.text4}>Kembali Ke Pencarian</Text>
+              <Text style={styles.text4}>Kembali Ke {text}</Text>
           </TouchableOpacity>
         </View>
       </View>

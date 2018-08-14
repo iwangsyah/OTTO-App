@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Platform,
   AsyncStorage,
+  ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
   TextInput,
@@ -26,6 +27,7 @@ export default class LoginScreen extends Component {
       password: null,
       imei: null,
       status: null,
+      press: false
     }
     this.login = this.login.bind(this)
   }
@@ -48,6 +50,7 @@ export default class LoginScreen extends Component {
   }
 
   async login() {
+    this.setState({press: true})
     let { username, password, imei } = this.state
     let conn = await this.checkConnection()
     if (password) {
@@ -56,6 +59,7 @@ export default class LoginScreen extends Component {
     if (conn) {
       this.checkLogin(username, password, imei)
     } else {
+      this.setState({press: false})
       alert('Tidak bisa terhubung ke server.\nPeriksa koneksi internet anda!')
     }
   }
@@ -92,6 +96,7 @@ export default class LoginScreen extends Component {
         } else {
           this.setState({status: responseJson})
         }
+        this.setState({press: false})
         if (responseJson) {
           setTimeout(() => {
             this.setState({status: null})
@@ -112,12 +117,16 @@ export default class LoginScreen extends Component {
     this.setState({ password: text })
   }
 
-  gotoKontak() {
+  gotoDaftar() {
     Actions.daftar()
   }
 
+  gotoKontak() {
+    Actions.kontak({ text: 'Login'})
+  }
+
   render() {
-    let { status } = this.state
+    let { status, press } = this.state
     let warning = null
     if (status) {
       if (status == "salah") {
@@ -139,6 +148,17 @@ export default class LoginScreen extends Component {
           </View>
         )
       }
+    }
+    let icon = null
+    if (press) {
+      icon = (
+        <ActivityIndicator
+          animating={true}
+          style={{height: 80}}
+          size="large" />
+      )
+    } else {
+      icon = null
     }
 
     return (
@@ -173,14 +193,21 @@ export default class LoginScreen extends Component {
               style={styles.textInput}
             />
           </View>
+          {icon}
           <TouchableOpacity onPress={this.login} style={styles.buttonLogin}>
               <Text style={styles.textLogin}>Log In</Text>
           </TouchableOpacity>
           {warning}
           <View style={{flexDirection:'row', top:10}}>
             <Text style={{fontWeight:'bold', color:'#ffffff'}}> Belum punya akun ? </Text>
-            <TouchableOpacity onPress={this.gotoKontak}>
+            <TouchableOpacity onPress={this.gotoDaftar}>
               <Text style={{fontWeight:'bold', color:'#841584'}}> Daftar</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{flexDirection:'row', top:10}}>
+            <Text style={{fontWeight:'bold', color:'#ffffff'}}> Atau hubungi kontak </Text>
+            <TouchableOpacity onPress={this.gotoKontak}>
+              <Text style={{fontWeight:'bold', color:'#841584'}}> Disini</Text>
             </TouchableOpacity>
           </View>
         </LinearGradient>

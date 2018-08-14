@@ -13,7 +13,8 @@ import LoginScreen from '../components/screens/LoginScreen'
 import Home from '../components/screens/Home'
 import DetailScreen from '../components/screens/DetailScreen'
 import KontakScreen from '../components/screens/KontakScreen'
-import KontakDaftar from '../components/screens/KontakDaftar'
+import DaftarScreen from '../components/screens/DaftarScreen'
+import DaftarSuksesScreen from '../components/screens/DaftarSuksesScreen'
 import DeviceInfo from '../components/screens/DeviceInfo'
 import store from '../store'
 
@@ -53,10 +54,15 @@ export default class DemoApp extends React.Component {
                    panHandlers={null}
                    hideNavBar={true} />
             <Scene key='daftar'
-                   component={KontakDaftar}
-                   title='KontakScreen'
+                   component={DaftarScreen}
+                   title='DaftarScreen'
                    panHandlers={null}
                    hideNavBar={true} />
+            <Scene key='daftarSukses'
+                   component={DaftarSuksesScreen}
+                   title='KontakScreen'
+                   panHandlers={null}
+                   hideNavBar={true}/>
           </Scene>
         </RouterWithRedux>
       </Provider>

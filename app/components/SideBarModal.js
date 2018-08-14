@@ -59,7 +59,7 @@ class SidebarModal extends Component {
 
   gotoKontak() {
     this.props.hideModal()
-    Actions.kontak()
+    Actions.kontak({ text: 'Pencarian'})
   }
 
   gotoDeviceInfo() {
@@ -76,7 +76,6 @@ class SidebarModal extends Component {
 
   render() {
     let { visible, signedIn, hideModal } = this.props
-
     return (
       <TouchableWithoutFeedback>
         <Modal
