@@ -22,7 +22,6 @@ class SidebarModal extends Component {
     this.state = {
       showDeveloperMenu: false,
     }
-
     this.gotoHome = this.gotoHome.bind(this)
     this.gotoUpdate = this.gotoUpdate.bind(this)
     this.gotoKontak = this.gotoKontak.bind(this)
@@ -30,10 +29,16 @@ class SidebarModal extends Component {
     this.logout = this.logout.bind(this)
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.visible) {
+      this.getKontak()
+    }
+  }
+
   async checkConnection() {
     let status = null
     try {
-      const res = await fetch('https://prod.facilgo.com/');
+      const res = await fetch('http://tokosibuk.com/');
       if (res.status === 200) {
         status = true;
       }
@@ -41,6 +46,27 @@ class SidebarModal extends Component {
       status = false;
     }
     return status
+  }
+
+  async getKontak() {
+    try {
+      let response = await fetch('http://tokosibuk.com/v1/kontak.php', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+      } else {
+        let kontak = responseJson
+        AsyncStorage.setItem('dataKontak', JSON.stringify(kontak))
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   gotoHome() {

@@ -3,9 +3,11 @@ import {
   Platform,
   AsyncStorage,
   ActivityIndicator,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  Keyboard,
   Button,
   Text,
   View
@@ -69,13 +71,35 @@ export default class DaftarScreen extends Component {
     }
   }
 
+  validateEmail() {
+    let text = this.state.email
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ ;
+    if(reg.test(text) === false)
+    {
+    console.log("Email is Not Correct");
+    return false;
+      }
+    else {
+      console.log("Email is Correct");
+    }
+  }
+
   daftarValidation() {
     let { username, password, passwordConfirm, email, phone } = this.state
+    let emailValid = true
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if(reg.test(email) === false) {
+      emailValid = false
+    }
     if (password !== passwordConfirm) {
       this.setState({status: "not match", passwordConfirm: null})
     } else if (username && password && passwordConfirm && email && phone) {
-      this.setState({status: "sukses"})
-      this.daftar()
+      if (emailValid) {
+        this.setState({status: "sukses"})
+        this.daftar()
+      } else {
+        this.setState({status: "email invalid"})
+      }
     } else {
       this.setState({status: "not fill"})
     }
@@ -177,6 +201,12 @@ export default class DaftarScreen extends Component {
             <Text style={{fontWeight:'bold', alignSelf:'center'}}>Ada form yang belum diisi</Text>
           </View>
         )
+      } else if (status == "email invalid") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Masukan email dengan benar</Text>
+          </View>
+        )
       }
     }
 
@@ -193,6 +223,7 @@ export default class DaftarScreen extends Component {
     }
 
     return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
           <Text style={styles.buttonText}>
             DAFTAR
@@ -248,6 +279,7 @@ export default class DaftarScreen extends Component {
               placeholder="Email"
               placeholderTextColor="#ffffff"
               autoCapitalize="none"
+              keyboardType="email-address"
               onChangeText={this.onChangeEmail.bind(this)}
               style={styles.textInput}
             />
@@ -261,6 +293,7 @@ export default class DaftarScreen extends Component {
               placeholder="No. Handphone"
               placeholderTextColor="#ffffff"
               autoCapitalize="none"
+              keyboardType="phone-pad"
               onChangeText={this.onChangePhone.bind(this)}
               style={styles.textInput}
             />
@@ -274,6 +307,7 @@ export default class DaftarScreen extends Component {
               <Text style={styles.textLogin}>Kembali</Text>
           </TouchableOpacity>
         </LinearGradient>
+      </TouchableWithoutFeedback>
     );
   }
 }

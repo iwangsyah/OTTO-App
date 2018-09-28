@@ -4,11 +4,13 @@ import {
   StyleSheet,
   Text,
   View,
+  Keyboard,
   TextInput,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
   AsyncStorage,
+  BackHandler
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -39,13 +41,29 @@ export class Home extends Component {
     this.renderRow = this.renderRow.bind(this)
     this.searchValidation = this.searchValidation.bind(this)
     this.onSearch = this.onSearch.bind(this)
+    this.handleBackButton = this.handleBackButton.bind(this)
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  handleBackButton = () => {
+    if (Actions.state.index == 1) {
+      BackHandler.exitApp()
+      return false
+    }
+    Actions.pop()
+    return true
+}
 
   componentWillMount() {
     this.checkData()
   }
 
   componentDidMount() {
+    Keyboard.dismiss
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     AsyncStorage.getItem('userLogged').then((id)=>{
       id = Number(JSON.parse(id))
       this.checkActiveStatus(id)

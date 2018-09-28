@@ -4,6 +4,7 @@ import {
   Text,
   Linking,
   StyleSheet,
+  AsyncStorage,
   TouchableOpacity
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
@@ -12,6 +13,22 @@ import Communications from 'react-native-communications'
 
 
 export default class KontakScreen extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      nama: null,
+      telp: null,
+      no_rek: null,
+      nominal: false,
+    }
+  }
+
+  componentWillMount() {
+    AsyncStorage.getItem('dataKontak').then((dataKontak)=>{
+      let kontak = JSON.parse(dataKontak)
+      this.setState({ nama: kontak.nama, telp: kontak.no_tlp })
+    })
+  }
 
   back() {
     Actions.pop()
@@ -26,15 +43,17 @@ export default class KontakScreen extends Component {
   }
 
   render() {
+    console.log('state: ', this.state);
+    let { nama, telp } = this.state
     let { item, text } = this.props
     return(
       <View>
         <View style={{backgroundColor:'#ffffff', height:'100%', flexDirection:'column', justifyContent:'space-between'}}>
         {this.renderHeader()}
           <View style={{margin:10}}>
-                <Text style={styles.text1}>Bpk. Wahyu</Text>
-                <Text style={styles.text2}>0819 0805 7587</Text>
-                <TouchableOpacity onPress={() => Communications.phonecall('081908057587', true)}
+                <Text style={styles.text1}>Bpk. {nama}</Text>
+                <Text style={styles.text2}>{telp}</Text>
+                <TouchableOpacity onPress={() => Communications.phonecall(telp, true)}
                 style={{
                   marginTop:30,
                   padding:10,

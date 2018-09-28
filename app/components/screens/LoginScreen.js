@@ -3,9 +3,11 @@ import {
   Platform,
   AsyncStorage,
   ActivityIndicator,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  Keyboard,
   Button,
   Text,
   View
@@ -34,6 +36,7 @@ export default class LoginScreen extends Component {
 
   componentDidMount() {
     this.setState({imei: DeviceInfo.getSerialNumber()})
+    this.getKontak()
   }
 
   async checkConnection() {
@@ -50,6 +53,7 @@ export default class LoginScreen extends Component {
   }
 
   async login() {
+    Keyboard.dismiss
     this.setState({press: true})
     let { username, password, imei } = this.state
     let conn = await this.checkConnection()
@@ -102,6 +106,27 @@ export default class LoginScreen extends Component {
             this.setState({status: null})
           },2500)
         }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getKontak() {
+    try {
+      let response = await fetch('http://tokosibuk.com/v1/kontak.php', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+      } else {
+        let kontak = responseJson
+        AsyncStorage.setItem('dataKontak', JSON.stringify(kontak))
       }
     } catch (error) {
       console.log(error);
@@ -162,6 +187,7 @@ export default class LoginScreen extends Component {
     }
 
     return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
           <Text style={styles.buttonText}>
             OTTO APP
@@ -211,6 +237,7 @@ export default class LoginScreen extends Component {
             </TouchableOpacity>
           </View>
         </LinearGradient>
+      </TouchableWithoutFeedback>
     );
   }
 }

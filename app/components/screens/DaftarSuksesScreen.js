@@ -3,17 +3,30 @@ import {
   View,
   Text,
   StyleSheet,
+  AsyncStorage,
   TouchableOpacity
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 
-export default class DetailScreen extends Component {
+export default class DaftarSukses extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      nama: null,
+      telp: null,
+      bank: null,
+      no_rek: null,
+      nama_rek: null,
+      nominal: null,
     }
   }
 
+  componentWillMount() {
+    AsyncStorage.getItem('dataKontak').then((dataKontak)=>{
+      let kontak = JSON.parse(dataKontak)
+      this.setState({ nama: kontak.nama, telp: kontak.no_tlp, bank: kontak.bank, no_rek: kontak.no_rek, nama_rek: kontak.nama_rek, nominal: kontak.nominal })
+    })
+  }
 
   back() {
     Actions.login()
@@ -31,6 +44,7 @@ export default class DetailScreen extends Component {
   }
 
   render() {
+    let { nama, telp, bank, no_rek, nama_rek, nominal } = this.state
     let { username, password, email, phone } = this.props
     return(
       <View style={styles.container}>
@@ -46,11 +60,11 @@ export default class DetailScreen extends Component {
             <Text>Cek Inbok atau spam email {email}</Text>
           </View>
           <Text style={styles.text2}>Untuk mengaktifkan akun ini silahkan melakukan transfer ke rekening ini:</Text>
-          <Text style={styles.text1}>BCA 00000000</Text>
-          <Text style={styles.text1}>a/n Wahyu</Text>
-          <Text style={styles.text1}>Nominal: Rp 00000,-</Text>
+          <Text style={styles.text1}>{bank} {no_rek}</Text>
+          <Text style={styles.text1}>a/n {nama_rek}</Text>
+          <Text style={styles.text1}>Nominal: Rp {nominal},-</Text>
           <View>
-            <Text>Untuk konfirmasi transfer silahkan kirim bukti transfer, username, dan email ke nomor WA ini (081908057587) </Text>
+            <Text>Untuk konfirmasi transfer silahkan kirim bukti transfer, username, dan email ke nomor WA ini ({telp}) </Text>
           </View>
           <TouchableOpacity onPress={this.back.bind(this)} style={{    marginTop:30,
               padding: 10,
