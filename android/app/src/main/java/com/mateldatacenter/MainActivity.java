@@ -1,4 +1,4 @@
-package com.otto_app;
+package com.mateldatacenter;
 
 import com.facebook.react.ReactActivity;
 
