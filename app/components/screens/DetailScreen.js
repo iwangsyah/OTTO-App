@@ -15,11 +15,20 @@ export default class DetailScreen extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      press: false
     }
   }
 
+  componentDidMount() {
+    this.setState({ press: false })
+  }
+
   back() {
-    Actions.pop()
+    let { press } = this.state
+    if (!press) {
+      Actions.pop()
+    }
+    this.setState({ press: true })
   }
 
   renderHeader() {

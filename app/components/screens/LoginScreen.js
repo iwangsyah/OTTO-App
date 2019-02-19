@@ -42,7 +42,7 @@ export default class LoginScreen extends Component {
   async checkConnection() {
     let status = null
     try {
-      const res = await fetch('http://tokosibuk.com/');
+      const res = await fetch('https://tokosibuk.com/');
       if (res.status === 200) {
         status = true;
       }
@@ -70,7 +70,7 @@ export default class LoginScreen extends Component {
 
   async checkLogin(username, password, imei) {
     try {
-      let response = await fetch('http://tokosibuk.com/v1/user_login.php',{
+      let response = await fetch('https://tokosibuk.com/v1/user_login.php',{
 			method:'POST',
 			header:{
 				'Accept': 'application/json',
@@ -114,7 +114,7 @@ export default class LoginScreen extends Component {
 
   async getKontak() {
     try {
-      let response = await fetch('http://tokosibuk.com/v1/kontak.php', {
+      let response = await fetch('https://tokosibuk.com/v1/kontak.php', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -190,7 +190,7 @@ export default class LoginScreen extends Component {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
           <Text style={styles.buttonText}>
-            OTTO APP
+            MDC APP
           </Text>
           <View style={styles.textInputContainer}>
             <View style={{top: 15}}>

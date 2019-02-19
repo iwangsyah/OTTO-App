@@ -40,7 +40,7 @@ export default class SplashScreen extends Component {
     return (
         <LinearGradient colors={['#c661e8', '#f477cb', '#f28465']} style={styles.linearGradient}>
           <Text style={styles.buttonText}>
-            OTTO APP
+            MDC APP
           </Text>
         </LinearGradient>
     );

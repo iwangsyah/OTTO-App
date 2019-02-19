@@ -20,6 +20,7 @@ export default class KontakScreen extends Component {
       telp: null,
       no_rek: null,
       nominal: false,
+      press: false
     }
   }
 
@@ -30,8 +31,16 @@ export default class KontakScreen extends Component {
     })
   }
 
+  componentDidMount() {
+    this.setState({ press: false })
+  }
+
   back() {
-    Actions.pop()
+    let { press } = this.state
+    if (!press) {
+      Actions.pop()
+    }
+    this.setState({ press: true })
   }
 
   renderHeader() {
@@ -43,7 +52,6 @@ export default class KontakScreen extends Component {
   }
 
   render() {
-    console.log('state: ', this.state);
     let { nama, telp } = this.state
     let { item, text } = this.props
     return(

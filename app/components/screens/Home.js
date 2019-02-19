@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   AsyncStorage,
-  BackHandler
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -21,7 +20,7 @@ import layoutStyles from '../../styles/layout'
 import styles from '../../styles/home'
 import { setDataFetch } from '../../actions/dataPlat'
 import SideBarModal from '../SideBarModal'
-import { menuSetVisibility } from '../../actions/sidebar'
+import { menuSetVisibility, setUpdateExist } from '../../actions/sidebar'
 
 const barsIcon = (<Icon name="bars" size={30} color="black" />)
 const searchIcon = (<Icon name="search" size={20} color="black" style={{alignSelf: 'center'}}/>)
@@ -41,21 +40,7 @@ export class Home extends Component {
     this.renderRow = this.renderRow.bind(this)
     this.searchValidation = this.searchValidation.bind(this)
     this.onSearch = this.onSearch.bind(this)
-    this.handleBackButton = this.handleBackButton.bind(this)
   }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
-  }
-
-  handleBackButton = () => {
-    if (Actions.state.index == 1) {
-      BackHandler.exitApp()
-      return false
-    }
-    Actions.pop()
-    return true
-}
 
   componentWillMount() {
     this.checkData()
@@ -63,7 +48,6 @@ export class Home extends Component {
 
   componentDidMount() {
     Keyboard.dismiss
-    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     AsyncStorage.getItem('userLogged').then((id)=>{
       id = Number(JSON.parse(id))
       this.checkActiveStatus(id)
@@ -90,7 +74,7 @@ export class Home extends Component {
 
   async checkActiveStatus(id) {
     try {
-      let response = await fetch('http://tokosibuk.com/v1/check_expired.php',{
+      let response = await fetch('https://tokosibuk.com/v1/check_expired.php',{
 			method:'POST',
 			header:{
 				'Accept': 'application/json',
@@ -122,7 +106,7 @@ export class Home extends Component {
   async getArticles() {
     try {
       this.setState({fetch: true})
-      let response = await fetch('http://tokosibuk.com/v1/konversi.php', {
+      let response = await fetch('https://tokosibuk.com/v1/konversi.php', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -137,6 +121,29 @@ export class Home extends Component {
         let articles = responseJson
         AsyncStorage.setItem('dataPlat', JSON.stringify(articles))
         this.setState({articles: articles, articles1: articles, fetch: false})
+        this.getDataDate()
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getDataDate() {
+    try {
+      let response = await fetch('https://tokosibuk.com/v1/date_data.php', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+      } else {
+        let dateData = responseJson.date
+        AsyncStorage.setItem('dateData', JSON.stringify(dateData))
+        this.props.setUpdateExist(false)
       }
     } catch (error) {
       console.log(error);
@@ -206,12 +213,15 @@ export class Home extends Component {
   }
 
   renderHeader() {
-  let { showMenu } = this.props
+    let { showMenu, updateExist } = this.props
     let { search } = this.state
 
     return (
       <View style={styles.container}>
         <View style={styles.container1}>
+        { updateExist && <View style={{backgroundColor: 'red', width: 20, height: 20, borderRadius: 10, position: 'absolute', zIndex: 1, top: -5, left: 20, justifyContent: 'center', alignItems: 'center'}}>
+          <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold'}}>!</Text>
+        </View> }
         <TouchableOpacity style={{width:50}} onPress={showMenu}>
           {barsIcon}
         </TouchableOpacity>
@@ -225,7 +235,6 @@ export class Home extends Component {
               onChangeText={this.onChangeTextSearch.bind(this)}
               value={this.state.searchText ? this.state.searchText.toUpperCase() : null}
               autoCapitalize="characters"
-              keyboardType='ascii-capable'
               returnKeyType="search"
               onSubmitEditing={this.searchValidation}/>
           </View>
@@ -240,11 +249,11 @@ export class Home extends Component {
     )
   }
 
-keyExtractor(data) {
-  if (data) {
-    return data.no
+  keyExtractor(data) {
+    if (data) {
+      return data.no
+    }
   }
-}
 
   render() {
     let { articles1, articles, newest, older } = this.state
@@ -289,6 +298,7 @@ keyExtractor(data) {
 let mapStateToProps = (state, props) => {
   return {
     visible: state.sidebarModal.visible,
+    updateExist: state.sidebarModal.exist,
   }
 }
 
@@ -297,6 +307,9 @@ let mapDispatchToProps = (dispatch) => {
     showMenu: () => {
       dispatch(menuSetVisibility(true))
     },
+    setUpdateExist: (exist) => {
+      dispatch(setUpdateExist(exist))
+    }
   }
 }
 

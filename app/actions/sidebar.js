@@ -6,3 +6,10 @@ export function menuSetVisibility(visible) {
     visible: visible,
   }
 }
+
+export function setUpdateExist(exist) {
+  return {
+    type: types.UPDATE_EXIST,
+    exist: exist,
+  }
+}

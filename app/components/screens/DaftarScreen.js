@@ -45,7 +45,7 @@ export default class DaftarScreen extends Component {
   async checkConnection() {
     let status = null
     try {
-      const res = await fetch('http://tokosibuk.com/');
+      const res = await fetch('https://tokosibuk.com/');
       if (res.status === 200) {
         status = true;
       }
@@ -95,8 +95,12 @@ export default class DaftarScreen extends Component {
       this.setState({status: "not match", passwordConfirm: null})
     } else if (username && password && passwordConfirm && email && phone) {
       if (emailValid) {
-        this.setState({status: "sukses"})
-        this.daftar()
+        if (phone.charAt(0) == 0 && phone.charAt(1) == 8 && phone.length > 10) {
+          this.setState({status: "sukses"})
+          this.daftar()
+        } else {
+          this.setState({status: "phone invalid"})
+        }
       } else {
         this.setState({status: "email invalid"})
       }
@@ -126,7 +130,7 @@ export default class DaftarScreen extends Component {
 
   async _onDaftar(username, password, email, phone, passDecrypt) {
     try {
-      let response = await fetch('http://tokosibuk.com/v1/user_registration.php',{
+      let response = await fetch('https://tokosibuk.com/v1/user_registration.php',{
 			method:'post',
 			header:{
 				'Accept': 'application/json',
@@ -142,6 +146,7 @@ export default class DaftarScreen extends Component {
 
 		})
       let responseJson = await response.json()
+      console.log(responseJson);
       if (responseJson.error) {
         console.log(responseJson.error);
         alert('Terjadi kesalahan koneksi ke server')
@@ -149,6 +154,11 @@ export default class DaftarScreen extends Component {
         this.setState({press: false})
         if (responseJson == "berhasil") {
           Actions.daftarSukses({username:username, password:passDecrypt, email:email, phone:phone})
+        } else if (responseJson == "sama") {
+          this.setState({status: "username sama"})
+          setTimeout(() => {
+            this.setState({status: null})
+          },2500)
         } else {
           alert("Gagal Mendaftar")
         }
@@ -205,6 +215,18 @@ export default class DaftarScreen extends Component {
         warning = (
           <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
             <Text style={{fontWeight:'bold', alignSelf:'center'}}>Masukan email dengan benar</Text>
+          </View>
+        )
+      } else if (status == "phone invalid") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Masukan nomor handphone dengan benar</Text>
+          </View>
+        )
+      } else if (status == "username sama") {
+        warning = (
+          <View style={{backgroundColor:'red', padding:10, width:'100%', marginTop:10}}>
+            <Text style={{fontWeight:'bold', alignSelf:'center'}}>Username sudah digunakan akun lain, gunakan username lain</Text>
           </View>
         )
       }

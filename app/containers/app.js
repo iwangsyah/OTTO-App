@@ -3,10 +3,11 @@ import {
   StyleSheet,
   Text,
   View,
-  NetInfo
+  NetInfo,
+  BackHandler
 } from 'react-native'
 
-import { Router, Scene, Stack } from 'react-native-router-flux'
+import { Actions, Router, Scene, Stack } from 'react-native-router-flux'
 import { connect, Provider } from 'react-redux'
 import SplashScreen from '../components/screens/SplashScreen'
 import LoginScreen from '../components/screens/LoginScreen'
@@ -21,7 +22,26 @@ import store from '../store'
 
 const RouterWithRedux = connect()(Router)
 
-export default class DemoApp extends React.Component {
+export default class App extends React.Component {
+
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  handleBackButton = () => {
+    let index = Actions.state.index
+    let firstRoute = ['login', 'home']
+    if (Actions.state.index == 1 || firstRoute.includes(Actions.state.routes[index].routeName)) {
+      BackHandler.exitApp()
+      return false
+    }
+    Actions.pop()
+    return true
+  }
 
   render() {
     return (

@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash'
 
 
-import { menuSetVisibility } from '../actions/sidebar'
+import { menuSetVisibility, setUpdateExist } from '../actions/sidebar'
 import styles from '../styles/sidebar'
 
 class SidebarModal extends Component {
@@ -18,7 +18,6 @@ class SidebarModal extends Component {
 
   constructor(props) {
     super(props)
-
     this.state = {
       showDeveloperMenu: false,
     }
@@ -27,6 +26,13 @@ class SidebarModal extends Component {
     this.gotoKontak = this.gotoKontak.bind(this)
     this.gotoDeviceInfo = this.gotoDeviceInfo.bind(this)
     this.logout = this.logout.bind(this)
+  }
+
+  async componentDidMount() {
+    AsyncStorage.getItem('dateData').then((dateData)=>{
+      let date = JSON.parse(dateData)
+      this.getDataDate(date)
+    })
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -38,7 +44,7 @@ class SidebarModal extends Component {
   async checkConnection() {
     let status = null
     try {
-      const res = await fetch('http://tokosibuk.com/');
+      const res = await fetch('https://tokosibuk.com/');
       if (res.status === 200) {
         status = true;
       }
@@ -50,7 +56,7 @@ class SidebarModal extends Component {
 
   async getKontak() {
     try {
-      let response = await fetch('http://tokosibuk.com/v1/kontak.php', {
+      let response = await fetch('https://tokosibuk.com/v1/kontak.php', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -63,6 +69,29 @@ class SidebarModal extends Component {
       } else {
         let kontak = responseJson
         AsyncStorage.setItem('dataKontak', JSON.stringify(kontak))
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getDataDate(date) {
+    try {
+      let response = await fetch('https://tokosibuk.com/v1/date_data.php', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+      } else {
+        let dateData = responseJson.date
+        if (date !== dateData) {
+          this.props.setUpdateExist(true)
+        }
       }
     } catch (error) {
       console.log(error);
@@ -101,7 +130,7 @@ class SidebarModal extends Component {
   }
 
   render() {
-    let { visible, signedIn, hideModal } = this.props
+    let { visible, signedIn, hideModal, updateExist } = this.props
     return (
       <TouchableWithoutFeedback>
         <Modal
@@ -121,6 +150,9 @@ class SidebarModal extends Component {
             </TouchableOpacity>
             <TouchableOpacity onPress={this.gotoUpdate}>
               <View style={styles.titleContainer}>
+                { updateExist && <View style={{backgroundColor: 'red', width: 20, height: 20, borderRadius: 10, position: 'absolute', zIndex: 1, top: 5, left: 10, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold'}}>!</Text>
+                </View> }
                 <Icon name="ios-sync-outline" size={25} style={{top:5}} style={{top:15}}/>
                 <Text style={[styles.menuModalItem, {marginLeft: 15}]}>Update</Text>
               </View>
@@ -148,6 +180,7 @@ class SidebarModal extends Component {
 let mapStateToProps = (state, props) => {
   return {
     visible: state.sidebarModal.visible,
+    updateExist: state.sidebarModal.exist,
   }
 }
 
@@ -156,6 +189,9 @@ let mapDispatchToProps = (dispatch) => {
     hideModal: () => {
       dispatch(menuSetVisibility(false))
     },
+    setUpdateExist: (exist) => {
+      dispatch(setUpdateExist(exist))
+    }
   }
 }
 
