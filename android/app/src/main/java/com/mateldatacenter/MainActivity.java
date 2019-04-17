@@ -1,4 +1,4 @@
-package com.mateldatacenter;
+package com.mateldatacenterapp;
 
 import com.facebook.react.ReactActivity;
 

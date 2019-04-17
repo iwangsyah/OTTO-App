@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  BackHandler,
+  Share,
   TouchableOpacity
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
@@ -15,21 +15,33 @@ export default class DetailScreen extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      press: false
     }
-  }
-
-  componentDidMount() {
-    this.setState({ press: false })
   }
 
   back() {
-    let { press } = this.state
-    if (!press) {
-      Actions.pop()
-    }
-    this.setState({ press: true })
+    Actions.pop()
   }
+
+  onShare = async (item) => {
+    try {
+      const result = await Share.share({
+        message:
+          `*NO PLAT*:\n ${item.plat}\n\n*NAMA*:\n ${item.asset}\n\n*WARNA*:\n ${item.color}\n\n*HARGA*:\n Rp ${item.amount}\n\n*STATUS*:\n ${item.status}\n\n\n\n*INFO LEBIH LANJUT*:\nhttps://play.google.com/store/apps/details?id=com.mateldatacenterapp`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   renderHeader() {
     let { search } = this.state
@@ -57,7 +69,18 @@ export default class DetailScreen extends Component {
               <Text style={styles.text1}>STATUS :</Text>
               <Text style={styles.text2}>{item.status}</Text>
         </View>
-        <TouchableOpacity onPress={this.back.bind(this)} style={{    marginTop:30,
+        <TouchableOpacity onPress={() => this.onShare(item)} style={{    marginTop:30,
+            padding: 10,
+            backgroundColor:'green',
+            width: '80%',
+            justifyContent:'center',
+            alignSelf:'center',
+            alignItems: 'center',
+            borderRadius: 20,
+            bottom:30}}>
+            <Text style={styles.text4}>Share</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={this.back.bind(this)} style={{
             padding: 10,
             backgroundColor:'#c661e8',
             width: '80%',
@@ -106,3 +129,4 @@ const styles = StyleSheet.create({
     color:'#ffffff',
   }
 });
+

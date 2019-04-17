@@ -10,9 +10,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   AsyncStorage,
+  BackHandler
 } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import listingStyles from '../../styles/listing'
@@ -20,7 +22,7 @@ import layoutStyles from '../../styles/layout'
 import styles from '../../styles/home'
 import { setDataFetch } from '../../actions/dataPlat'
 import SideBarModal from '../SideBarModal'
-import { menuSetVisibility, setUpdateExist } from '../../actions/sidebar'
+import { menuSetVisibility } from '../../actions/sidebar'
 
 const barsIcon = (<Icon name="bars" size={30} color="black" />)
 const searchIcon = (<Icon name="search" size={20} color="black" style={{alignSelf: 'center'}}/>)
@@ -34,35 +36,57 @@ export class Home extends Component {
       articles1: [],
       fetch: false,
       search: [],
-      update: false
+      update: false,
+      keyboardShow: true
     }
     this.getArticles = this.getArticles.bind(this)
     this.renderRow = this.renderRow.bind(this)
     this.searchValidation = this.searchValidation.bind(this)
     this.onSearch = this.onSearch.bind(this)
+    this.handleBackButton = this.handleBackButton.bind(this)
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  handleBackButton = () => {
+    if (['home', 'login'].includes(_.last(Actions.state.routes).routeName)) {
+      BackHandler.exitApp()
+      return false
+    }
+    Actions.pop()
+    return true
+}
 
   componentWillMount() {
     this.checkData()
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     Keyboard.dismiss
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     AsyncStorage.getItem('userLogged').then((id)=>{
       id = Number(JSON.parse(id))
       this.checkActiveStatus(id)
     })
+    
     if (this.props.update) {
       this.getArticles()
     } else {
-      AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
-        let data = JSON.parse(dataPlat)
-        if (data && data.length != 0) {
-          this.setState({articles: data, articles1: data})
-        } else {
-          this.getArticles()
-        }
-      })
+      this.checkData()
+    }
+  }
+
+  
+  async checkData() {
+    let dataPlatJson = await AsyncStorage.getItem('dataPlat')
+    let dataPlat = JSON.parse(dataPlatJson)
+    if (dataPlat) {
+      this.setState({ articles1: dataPlat, articles: dataPlat })
+      this.getArticles(true)
+    } else {
+      this.getArticles()
     }
   }
 
@@ -74,18 +98,17 @@ export class Home extends Component {
 
   async checkActiveStatus(id) {
     try {
-      let response = await fetch('https://tokosibuk.com/v1/check_expired.php',{
-			method:'POST',
-			header:{
-				'Accept': 'application/json',
-				'Content-type': 'application/json'
-			},
-			body:JSON.stringify({
-				// we will pass our input data to server
+      let response = await fetch('http://tokosibuk.com/v1/check_expired.php',{
+      method:'POST',
+      header:{
+        'Accept': 'application/json',
+        'Content-type': 'application/json'
+      },
+      body:JSON.stringify({
         "id":id
-			})
+      })
 
-		})
+    })
       let responseJson = await response.json()
       if (responseJson.error) {
         console.log(responseJson.error);
@@ -103,10 +126,12 @@ export class Home extends Component {
     }
   }
 
-  async getArticles() {
+  async getArticles(status) {
     try {
-      this.setState({fetch: true})
-      let response = await fetch('https://tokosibuk.com/v1/konversi.php', {
+      if (!status) {
+        this.setState({fetch: true})
+      }
+      let response = await fetch('http://tokosibuk.com/v1/konversi.php', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -119,42 +144,13 @@ export class Home extends Component {
         alert('Terjadi kesalahan saat koneksi ke server')
       } else {
         let articles = responseJson
-        AsyncStorage.setItem('dataPlat', JSON.stringify(articles))
+        articlesSave = articles.slice(0, 16000)
+        await AsyncStorage.setItem('dataPlat', JSON.stringify(articlesSave))
         this.setState({articles: articles, articles1: articles, fetch: false})
-        this.getDataDate()
       }
     } catch (error) {
       console.log(error);
     }
-  }
-
-  async getDataDate() {
-    try {
-      let response = await fetch('https://tokosibuk.com/v1/date_data.php', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      })
-      let responseJson = await response.json()
-      if (responseJson.error) {
-        console.log(responseJson.error);
-      } else {
-        let dateData = responseJson.date
-        AsyncStorage.setItem('dateData', JSON.stringify(dateData))
-        this.props.setUpdateExist(false)
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  checkData() {
-    AsyncStorage.getItem('dataPlat').then((dataPlat)=>{
-      let data = JSON.parse(dataPlat)
-      this.setState({ articles1: data, articles: data })
-    })
   }
 
   toDetail(article) {
@@ -213,15 +209,12 @@ export class Home extends Component {
   }
 
   renderHeader() {
-    let { showMenu, updateExist } = this.props
+  let { showMenu } = this.props
     let { search } = this.state
 
     return (
       <View style={styles.container}>
         <View style={styles.container1}>
-        { updateExist && <View style={{backgroundColor: 'red', width: 20, height: 20, borderRadius: 10, position: 'absolute', zIndex: 1, top: -5, left: 20, justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold'}}>!</Text>
-        </View> }
         <TouchableOpacity style={{width:50}} onPress={showMenu}>
           {barsIcon}
         </TouchableOpacity>
@@ -235,6 +228,7 @@ export class Home extends Component {
               onChangeText={this.onChangeTextSearch.bind(this)}
               value={this.state.searchText ? this.state.searchText.toUpperCase() : null}
               autoCapitalize="characters"
+              keyboardType='web-search'
               returnKeyType="search"
               onSubmitEditing={this.searchValidation}/>
           </View>
@@ -249,11 +243,11 @@ export class Home extends Component {
     )
   }
 
-  keyExtractor(data) {
-    if (data) {
-      return data.no
-    }
+keyExtractor(data) {
+  if (data) {
+    return data.no
   }
+}
 
   render() {
     let { articles1, articles, newest, older } = this.state
@@ -283,13 +277,20 @@ export class Home extends Component {
         )
       }
     }
-
+    console.log('render');
+    
     return (
-      <View>
-        <View style={[layoutStyles.body, listingStyles.body]}>
-          {this.renderHeader()}
-          {content}
-        </View>
+      <View style={[layoutStyles.body, listingStyles.body]}>
+        {this.renderHeader()}
+        {content}
+        <TouchableOpacity onPress={() => this.setState({ keyboardShow: true})} style={{backgroundColor: '#c661e8', width: '100%', height: 50}}>
+
+        </TouchableOpacity>
+        <GestureRecognizer
+          onSwipeDown={() => this.setState({ keyboardShow: false })}
+         style={{backgroundColor: '#c661e8', width: '100%', height: 300, display: this.state.keyboardShow ? 'flex' : 'none'}}>
+          <Text>Keyboard</Text>
+        </GestureRecognizer>
       </View>
     );
   }
@@ -298,7 +299,6 @@ export class Home extends Component {
 let mapStateToProps = (state, props) => {
   return {
     visible: state.sidebarModal.visible,
-    updateExist: state.sidebarModal.exist,
   }
 }
 
@@ -307,9 +307,6 @@ let mapDispatchToProps = (dispatch) => {
     showMenu: () => {
       dispatch(menuSetVisibility(true))
     },
-    setUpdateExist: (exist) => {
-      dispatch(setUpdateExist(exist))
-    }
   }
 }
 

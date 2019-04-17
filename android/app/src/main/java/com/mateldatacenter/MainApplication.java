@@ -1,4 +1,4 @@
-package com.mateldatacenter;
+package com.mateldatacenterapp;
 
 import android.app.Application;
 
