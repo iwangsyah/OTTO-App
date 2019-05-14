@@ -3,6 +3,7 @@ package com.mateldatacenterapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactlibrary.RNCustomKeyboardKitPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import codes.simen.IMEI.IMEI;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNCustomKeyboardKitPackage(),
             new VectorIconsPackage(),
             new LinearGradientPackage(),
             new IMEI(),
