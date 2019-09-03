@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   Platform,
   StyleSheet,
@@ -12,8 +12,19 @@ import {
   AsyncStorage,
   BackHandler
 } from 'react-native';
+
+import { 
+  CustomTextInput,
+  register,
+  insertText,
+  backSpace,
+  uninstall,
+  hideKeyboard,
+} from 'react-native-custom-keyboard-kit';
+
 import { Actions } from 'react-native-router-flux'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import IconIonicons from 'react-native-vector-icons/Ionicons';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import _ from 'lodash'
 import { connect } from 'react-redux'
@@ -26,6 +37,371 @@ import { menuSetVisibility } from '../../actions/sidebar'
 
 const barsIcon = (<Icon name="bars" size={30} color="black" />)
 const searchIcon = (<Icon name="search" size={20} color="black" style={{alignSelf: 'center'}}/>)
+const backspaceIcon = (<IconIonicons name="ios-backspace" size={20} color="black" style={{alignSelf: 'center'}}/>)
+
+const styless = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgb(0, 185, 230)',
+  },
+  input: {
+    backgroundColor:'#ffffff', 
+    height:30, 
+    paddingLeft: 10, 
+    padding: 0, 
+    paddingLeft: 10, 
+    borderRadius: 12
+  },
+  buttonLabel: {
+    borderWidth: 0.5,
+    borderColor: "#d6d7da",
+    padding: 5,
+    textAlign: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 20,
+    color: '#ffffff'
+  },
+  button: {
+    width: "15%",
+    backgroundColor: 'rgb(0, 185, 230)',
+    margin: 4
+  },
+  buttonQwerty: {
+    width: 33,
+    borderWidth: 0.5,
+    borderColor: "#d6d7da",
+    padding: 5,
+    backgroundColor: '#ffffff',
+    margin: 1
+  },
+  buttonLabelQwerty: {
+    textAlign: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 20,
+    color: '#000000'
+  },
+});
+
+class MyKeyboard extends Component {
+  constructor(props) {
+  super(props);
+    this.onPressButton - this.onPressButton.bind(this)
+  }
+
+  onPressButton = (text) => {
+    insertText(this.props.tag, text);
+  }
+  
+  onPressBackSpace = () => {
+    backSpace(this.props.tag);
+  }
+  
+  onPressHideKeyboard = () => {
+    hideKeyboard(this.props.tag);
+  }
+
+  render() {
+    return (
+      <View style={{backgroundColor: '#c661e8', justifyContent: 'center', alignItems: 'center', paddingBottom: 5}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 5}}>
+          <TouchableOpacity onPress={this.onPressBackSpace} style={[styless.button, {backgroundColor: 'rgb(0, 185, 230)', padding: 5, left: 10}]}>
+            {backspaceIcon}
+          </TouchableOpacity>
+          <View style={{width: '75%', alignItems: 'center'}}>
+            <View style={{flexDirection: "row"}}>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '1')}>
+                  <Text style={styless.buttonLabel}>
+                    1
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '2')}>
+                  <Text style={styless.buttonLabel}>
+                    2
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '3')}>
+                  <Text style={styless.buttonLabel}>
+                    3
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '4')}>
+                  <Text style={styless.buttonLabel}>
+                    4
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '5')}>
+                  <Text style={styless.buttonLabel}>
+                    5
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{flexDirection: "row"}}>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '6')}>
+                  <Text style={styless.buttonLabel}>
+                    6
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '7')}>
+                  <Text style={styless.buttonLabel}>
+                    7
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '8')}>
+                  <Text style={styless.buttonLabel}>
+                    8
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '9')}>
+                  <Text style={styless.buttonLabel}>
+                    9
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styless.button}>
+                <TouchableOpacity onPress={this.onPressButton.bind(this, '0')}>
+                  <Text style={styless.buttonLabel}>
+                    0
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <TouchableOpacity onPress={this.onPressBackSpace} style={[styless.button, {backgroundColor: 'rgb(0, 185, 230)', padding: 5, right: 10}]}>
+            {backspaceIcon}
+          </TouchableOpacity>
+        </View>
+
+        <View style={{flexDirection: "row"}}>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'Q')}>
+              <Text style={styless.buttonLabelQwerty}>
+                Q
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'W')}>
+              <Text style={styless.buttonLabelQwerty}>
+                W
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'E')}>
+              <Text style={styless.buttonLabelQwerty}>
+                E
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'R')}>
+              <Text style={styless.buttonLabelQwerty}>
+                R
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'T')}>
+              <Text style={styless.buttonLabelQwerty}>
+                T
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'Y')}>
+              <Text style={styless.buttonLabelQwerty}>
+                Y
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'U')}>
+              <Text style={styless.buttonLabelQwerty}>
+                U
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'I')}>
+              <Text style={styless.buttonLabelQwerty}>
+                I
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'O')}>
+              <Text style={styless.buttonLabelQwerty}>
+                O
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'P')}>
+              <Text style={styless.buttonLabelQwerty}>
+                P
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{flexDirection: "row"}}>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'A')}>
+              <Text style={styless.buttonLabelQwerty}>
+                A
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'S')}>
+              <Text style={styless.buttonLabelQwerty}>
+                S
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'D')}>
+              <Text style={styless.buttonLabelQwerty}>
+                D
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'F')}>
+              <Text style={styless.buttonLabelQwerty}>
+                F
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'G')}>
+              <Text style={styless.buttonLabelQwerty}>
+                G
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'H')}>
+              <Text style={styless.buttonLabelQwerty}>
+                H
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'J')}>
+              <Text style={styless.buttonLabelQwerty}>
+                J
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'K')}>
+              <Text style={styless.buttonLabelQwerty}>
+                K
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'L')}>
+              <Text style={styless.buttonLabelQwerty}>
+                L
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{flexDirection: "row"}}>
+          <View style={[styless.buttonQwerty, {backgroundColor: 'rgb(0, 185, 230)', width: 45, marginRight: 10}]}>
+            <TouchableOpacity onPress={this.onPressHideKeyboard}>
+              <Text style={styless.buttonLabelQwerty}>
+                &#x25bc;
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'Z')}>
+              <Text style={styless.buttonLabelQwerty}>
+                Z
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'X')}>
+              <Text style={styless.buttonLabelQwerty}>
+                X
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'C')}>
+              <Text style={styless.buttonLabelQwerty}>
+                C
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'V')}>
+              <Text style={styless.buttonLabelQwerty}>
+                V
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'B')}>
+              <Text style={styless.buttonLabelQwerty}>
+                B
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'N')}>
+              <Text style={styless.buttonLabelQwerty}>
+                N
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styless.buttonQwerty}>
+            <TouchableOpacity onPress={this.onPressButton.bind(this, 'M')}>
+              <Text style={styless.buttonLabelQwerty}>
+                M
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={[styless.buttonQwerty, {backgroundColor: 'rgb(0, 185, 230)', width: 45, marginLeft: 10}]}>
+            <TouchableOpacity onPress={this.onPressHideKeyboard}>
+              <Text style={styless.buttonLabelQwerty}>
+                &#x25bc;
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  }
+}
+
+register('price', () => MyKeyboard);
 
 export class Home extends Component {
   constructor(props) {
@@ -90,10 +466,20 @@ export class Home extends Component {
     }
   }
 
-  onChangeTextSearch(text) {
-    this.setState({
-      searchText: text
-    })
+  onChangeTextSearch(search) {
+    // this.setState({
+    //   searchText: search
+    // })
+
+    console.log('this');
+    // console.log('searchd: ', search);
+    
+    // const filterPlat = _.filter(this.state.articles1, item =>
+    //   item.plat.includes(search)
+    // );
+    // console.log('fil: ', filterPlat);
+    
+    // this.setState({ articles: filterPlat });
   }
 
   async checkActiveStatus(id) {
@@ -190,6 +576,8 @@ export class Home extends Component {
     }
   }
 
+  
+
   renderRow(article) {
     let plat = null
     if (article.item) {
@@ -218,8 +606,22 @@ export class Home extends Component {
         <TouchableOpacity style={{width:50}} onPress={showMenu}>
           {barsIcon}
         </TouchableOpacity>
-          <View style={{width:'70%'}}>
-            <TextInput
+          <View style={{width:'80%'}}>
+            <CustomTextInput
+              autoFocus={true}
+              customKeyboardType="price"
+              value={this.state.searchText}
+              disableFullscreenUI={true}
+              autoCapitalize="characters"
+              placeholderTextColor='lightgrey'
+              underlineColorAndroid='transparent'
+              placeholder='Masukan Plat Nomor Di Sini'
+              onChangeText={this.onChangeText.bind(this)}
+              style={{backgroundColor:'#ffffff', height:30, paddingLeft: 10, padding: 0, paddingLeft: 10, borderRadius: 12}}
+              onFocus={() =>console.log("focus received" ) }
+              onBlur={() => console.log("focus lost") }
+            />
+            {/* <TextInput
               style={{backgroundColor:'#ffffff', height:30, paddingLeft: 10, padding: 0, paddingLeft: 10, borderRadius: 12}}
               disableFullscreenUI={true}
               underlineColorAndroid='transparent'
@@ -230,13 +632,13 @@ export class Home extends Component {
               autoCapitalize="characters"
               keyboardType='web-search'
               returnKeyType="search"
-              onSubmitEditing={this.searchValidation}/>
+              onSubmitEditing={this.searchValidation}/> */}
           </View>
-          <TouchableOpacity onPress={this.searchValidation}>
+          {/* <TouchableOpacity onPress={this.searchValidation}>
             <View style={{backgroundColor:'rgb(0, 185, 230)', width: 35, height:35, borderRadius: 17.5, justifyContent: 'center'}}>
               {searchIcon}
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <SideBarModal/>
       </View>
@@ -277,22 +679,21 @@ keyExtractor(data) {
         )
       }
     }
-    console.log('render');
     
     return (
       <View style={[layoutStyles.body, listingStyles.body]}>
         {this.renderHeader()}
         {content}
-        <TouchableOpacity onPress={() => this.setState({ keyboardShow: true})} style={{backgroundColor: '#c661e8', width: '100%', height: 50}}>
-
-        </TouchableOpacity>
-        <GestureRecognizer
-          onSwipeDown={() => this.setState({ keyboardShow: false })}
-         style={{backgroundColor: '#c661e8', width: '100%', height: 300, display: this.state.keyboardShow ? 'flex' : 'none'}}>
-          <Text>Keyboard</Text>
-        </GestureRecognizer>
       </View>
     );
+  }
+
+  onChangeText(search) {
+    const filterPlat = _.filter(this.state.articles1, item =>
+        item.plat.includes(search)
+      );
+    
+    this.setState({ articles: filterPlat})
   }
 }
 
