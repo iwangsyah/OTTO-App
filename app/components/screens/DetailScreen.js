@@ -49,7 +49,7 @@ export default class DetailScreen extends Component {
 
     return (
       <View style={styles.containerHeader}>
-        <Text style={styles.text3}> {item.plat} </Text>
+        <Text style={styles.text3}> {item.plat || item.Police_No} </Text>
       </View>
     )
   }
@@ -61,13 +61,13 @@ export default class DetailScreen extends Component {
         {this.renderHeader()}
         <View style={{margin:10}}>
               <Text style={styles.text1}>NAMA :</Text>
-              <Text style={styles.text2}>{item.asset}</Text>
+              <Text style={styles.text2}>{item.asset || item.Asset_Name}</Text>
               <Text style={styles.text1}>WARNA :</Text>
-              <Text style={styles.text2}>{item.color}</Text>
+              <Text style={styles.text2}>{item.color || item.Asset_Color__Nosin}</Text>
               <Text style={styles.text1}>HARGA :</Text>
-              <Text style={styles.text2}>Rp {item.amount},-</Text>
+              <Text style={styles.text2}>Rp {item.amount || item.Amount},-</Text>
               <Text style={styles.text1}>STATUS :</Text>
-              <Text style={styles.text2}>{item.status}</Text>
+              <Text style={styles.text2}>{item.status || item.Status}</Text>
         </View>
         <TouchableOpacity onPress={() => this.onShare(item)} style={{    marginTop:30,
             padding: 10,

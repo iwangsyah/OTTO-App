@@ -413,6 +413,7 @@ export class Home extends Component {
       fetch: false,
       search: [],
       update: false,
+      status: false,
       keyboardShow: true
     }
     this.getArticles = this.getArticles.bind(this)
@@ -437,6 +438,7 @@ export class Home extends Component {
 
   componentWillMount() {
     this.checkData()
+    this.checkConnection()
   }
 
   async componentDidMount() {
@@ -454,10 +456,26 @@ export class Home extends Component {
     }
   }
 
+  async checkConnection() {
+    let status = null
+    try {
+      const res = await fetch('https://tokosibuk.com/');
+      if (res.status === 200) {
+        status = true;
+        this.setState({ status: true })
+      }
+    } catch (e) {
+      this.setState({ status: false })
+      status = false;
+    }
+    return status
+  }
   
   async checkData() {
     let dataPlatJson = await AsyncStorage.getItem('dataPlat')
     let dataPlat = JSON.parse(dataPlatJson)
+    console.log('dataPlat: ', dataPlat);
+    
     if (dataPlat) {
       this.setState({ articles1: dataPlat, articles: dataPlat })
       this.getArticles(true)
@@ -470,8 +488,6 @@ export class Home extends Component {
     // this.setState({
     //   searchText: search
     // })
-
-    console.log('this');
     // console.log('searchd: ', search);
     
     // const filterPlat = _.filter(this.state.articles1, item =>
@@ -480,6 +496,41 @@ export class Home extends Component {
     // console.log('fil: ', filterPlat);
     
     // this.setState({ articles: filterPlat });
+  }
+
+  async searchPlatAPI(plat) {
+    try {
+      let response = await fetch('http://tokosibuk.com/v1/search.php',{
+      method:'POST',
+      header:{
+        'Accept': 'application/json',
+        'Content-type': 'application/json'
+      },
+      body:JSON.stringify({
+        "Police_No":plat
+      })
+
+    })
+      let responseJson = await response.json()
+      if (responseJson.error) {
+        console.log(responseJson.error);
+        alert('Terjadi kesalahan koneksi ke server')
+      } else {
+        this.setState({ articles: responseJson})
+      }
+    } catch (error) {
+      const filterPlat = _.filter(this.state.articles1, item => {
+          if (item.plat) {
+            item.plat.includes(search)
+          } else {
+            item.Police_No.includes(search)
+          } 
+        }
+      );
+      
+      this.setState({ articles: filterPlat})
+      console.log(error);
+    }
   }
 
   async checkActiveStatus(id) {
@@ -530,7 +581,9 @@ export class Home extends Component {
         alert('Terjadi kesalahan saat koneksi ke server')
       } else {
         let articles = responseJson
-        articlesSave = articles.slice(0, 16000)
+        console.log('articles: ', articles);
+        
+        articlesSave = articles.slice(0, 1000)
         await AsyncStorage.setItem('dataPlat', JSON.stringify(articlesSave))
         this.setState({articles: articles, articles1: articles, fetch: false})
       }
@@ -581,7 +634,7 @@ export class Home extends Component {
   renderRow(article) {
     let plat = null
     if (article.item) {
-      plat = article.item.plat
+      plat = article.item.plat || article.item.Police_No
     }
     return (
       <TouchableOpacity onPress={this.toDetail.bind(this, article)}>
@@ -652,25 +705,28 @@ keyExtractor(data) {
 }
 
   render() {
-    let { articles1, articles, newest, older } = this.state
+    let { articles1, articles, searchText, older } = this.state
     let data = []
     let content = null
     if (this.state.fetch) {
+      console.log(1);
+      
       content = (
         <ActivityIndicator
           animating={true}
           style={{height: 80}}
           size="large" />
       )
-    } else {
+    } else {   
       content = (
         <FlatList
-          data = {data.concat(this.state.articles)}
+          data = {data.concat(articles)}
           keyExtractor = {this.keyExtractor}
-          renderItem = {this.renderRow} />
+          renderItem = {this.renderRow}
+          initialNumToRender = {20} />
       )
     }
-    if (this.state.articles) {
+    if (this.state.articles && searchText) {
       if (!this.state.fetch && this.state.articles.length == 0) {
         content = (
           <View style={{justifyContent:'center', alignItems:'center', marginTop:30}}>
@@ -689,11 +745,20 @@ keyExtractor(data) {
   }
 
   onChangeText(search) {
-    const filterPlat = _.filter(this.state.articles1, item =>
-        item.plat.includes(search)
+    this.setState({ searchText: search })
+    if (this.state.status) {
+      this.searchPlatAPI(search) 
+    } else {
+      const filterPlat = _.filter(this.state.articles1, item => {
+          if (item.plat) {
+            item.plat.includes(search)
+          } else {
+            item.Police_No.includes(search)
+          } 
+        }
       );
-    
-    this.setState({ articles: filterPlat})
+      this.setState({ articles: filterPlat})
+    }
   }
 }
 
